@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="cyber">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HARADA-BIO v6.0 — Pilotage Physiologique & Grille Harada</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* =====================================================================
+       5 THÈMES PERSONNALISABLES (VARIABLES CSS)
+       ===================================================================== */
+    :root, [data-theme="cyber"] {
+      --bg-page: #060913;
+      --bg-grad-1: rgba(34, 211, 238, 0.08);
+      --bg-grad-2: rgba(16, 185, 129, 0.07);
+      --bg-card: rgba(13, 20, 36, 0.88);
+      --bg-sub: rgba(7, 12, 24, 0.86);
+      --bg-input: #030712;
+      --border-card: rgba(56, 189, 248, 0.18);
+      --border-sub: rgba(148, 163, 184, 0.16);
+      --text-main: #e2e8f0;
+      --text-bright: #ffffff;
+      --text-muted: #94a3b8;
+      --accent: #22d3ee;
+      --accent-2: #10b981;
+      --accent-warn: #f59e0b;
+      --accent-danger: #f43f5e;
+      --accent-bg: rgba(34, 211, 238, 0.15);
+      --chart-grid: rgba(148, 163, 184, 0.12);
+    }
+
+    [data-theme="olive"] {
+      --bg-page: #0d120e;
+      --bg-grad-1: rgba(132, 204, 22, 0.07);
+      --bg-grad-2: rgba(217, 119, 6, 0.06);
+      --bg-card: rgba(20, 28, 21, 0.90);
+      --bg-sub: rgba(12, 18, 13, 0.88);
+      --bg-input: #080c09;
+      --border-card: rgba(163, 230, 53, 0.20);
+      --border-sub: rgba(168, 162, 158, 0.18);
+      --text-main: #e7e5e4;
+      --text-bright: #fafaf9;
+      --text-muted: #a8a29e;
+      --accent: #a3e635;
+      --accent-2: #d97706;
+      --accent-warn: #f59e0b;
+      --accent-danger: #ef4444;
+      --accent-bg: rgba(163, 230, 53, 0.14);
+      --chart-grid: rgba(168, 162, 158, 0.14);
+    }
+
+    [data-theme="gold"] {
+      --bg-page: #09090b;
+      --bg-grad-1: rgba(245, 158, 11, 0.08);
+      --bg-grad-2: rgba(234, 179, 8, 0.05);
+      --bg-card: rgba(20, 20, 23, 0.90);
+      --bg-sub: rgba(12, 12, 15, 0.90);
+      --bg-input: #050507;
+      --border-card: rgba(251, 191, 36, 0.24);
+      --border-sub: rgba(161, 161, 170, 0.16);
+      --text-main: #f4f4f5;
+      --text-bright: #ffffff;
+      --text-muted: #a1a1aa;
+      --accent: #fbbf24;
+      --accent-2: #34d399;
+      --accent-warn: #fb923c;
+      --accent-danger: #f43f5e;
+      --accent-bg: rgba(251, 191, 36, 0.15);
+      --chart-grid: rgba(161, 161, 170, 0.12);
+    }
+
+    [data-theme="light"] {
+      --bg-page: #f4f6f9;
+      --bg-grad-1: rgba(14, 165, 233, 0.06);
+      --bg-grad-2: rgba(16, 185, 129, 0.05);
+      --bg-card: #ffffff;
+      --bg-sub: #f8fafc;
+      --bg-input: #ffffff;
+      --border-card: #cbd5e1;
+      --border-sub: #e2e8f0;
+      --text-main: #1e293b;
+      --text-bright: #0f172a;
+      --text-muted: #64748b;
+      --accent: #0284c7;
+      --accent-2: #059669;
+      --accent-warn: #d97706;
+      --accent-danger: #e11d48;
+      --accent-bg: rgba(2, 132, 199, 0.12);
+      --chart-grid: rgba(15, 23, 42, 0.10);
+    }
+
+    /* NUIT ROUGE : STRICTEMENT ZÉRO CANAL VERT / BLEU */
+    [data-theme="night-red"] {
+      --bg-page: #050000;
+      --bg-grad-1: rgba(255, 0, 0, 0.06);
+      --bg-grad-2: rgba(180, 0, 0, 0.05);
+      --bg-card: #120000;
+      --bg-sub: #0a0000;
+      --bg-input: #050000;
+      --border-card: #4d0000;
+      --border-sub: #330000;
+      --text-main: #ff8a8a;
+      --text-bright: #ffb3b3;
+      --text-muted: #a63a3a;
+      --accent: #ff1a1a;
+      --accent-2: #d60000;
+      --accent-warn: #ff3300;
+      --accent-danger: #ff0000;
+      --accent-bg: rgba(255, 0, 0, 0.18);
+      --chart-grid: rgba(255, 0, 0, 0.18);
+    }
+
+    body {
+      background-color: var(--bg-page);
+      background-image:
+        radial-gradient(circle at 12% 8%, var(--bg-grad-1) 0%, transparent 40%),
+        radial-gradient(circle at 88% 15%, var(--bg-grad-2) 0%, transparent 42%);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .hud-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-card);
+      backdrop-filter: blur(14px);
+    }
+    .hud-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      box-shadow: 0 10px 28px -12px rgba(0, 0, 0, 0.45);
+    }
+    .hud-sub {
+      background: var(--bg-sub);
+      border: 1px solid var(--border-sub);
+    }
+    .hud-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-sub);
+      color: var(--text-bright);
+    }
+    .hud-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .text-bright { color: var(--text-bright); }
+    .text-muted { color: var(--text-muted); }
+    .text-accent { color: var(--accent); }
+    .text-accent2 { color: var(--accent-2); }
+    .mono-num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #050911;
+      font-weight: 800;
+    }
+    [data-theme="night-red"] .btn-accent { color: #ffffff; }
+    [data-theme="light"] .btn-accent { color: #ffffff; }
+
+    .btn-soft {
+      background: var(--accent-bg);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .btn-ghost {
+      background: var(--bg-sub);
+      border: 1px solid var(--border-sub);
+      color: var(--text-main);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--text-bright); }
+
+    .tab-btn-active {
+      background: var(--accent-bg);
+      border-color: var(--accent);
+      color: var(--text-bright);
+    }
+
+    /* Harada 9x9 Grid */
+    .harada-macro-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
+      gap: 8px;
+    }
+    .harada-subgrid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+      padding: 6px;
+      border-radius: 14px;
+      background: var(--bg-sub);
+      border: 1px solid var(--border-sub);
+    }
+    .harada-tile {
+      position: relative;
+      min-height: 58px;
+      padding: 4px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.12s ease, border-color 0.15s ease;
+    }
+    .harada-tile:hover { transform: translateY(-1px); }
+    .harada-tile.is-selected { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
+
+    /* =====================================================================
+       IMPRESSION FICHE PAPIER A5 PORTRAIT
+       ===================================================================== */
+    @media print {
+      @page { size: A5 portrait; margin: 5mm; }
+      body { background: #ffffff !important; color: #000000 !important; background-image: none !important; }
+      .no-print { display: none !important; }
+      #modal-a5 { position: static !important; background: #ffffff !important; padding: 0 !important; display: block !important; }
+      #modal-a5-chrome { display: none !important; }
+      #a5-sheet { width: 100% !important; min-height: auto !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+    }
+  </style>
+</head>
+<body class="pb-14">
+
+  <!-- TOASTS -->
+  <div id="toast-box" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm no-print"></div>
+
+  <!-- CONFIRM MODAL -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 no-print">
+    <div class="hud-card rounded-2xl max-w-sm w-full p-5 space-y-4">
+      <div>
+        <h3 id="confirm-title" class="text-sm font-bold text-bright">Confirmation</h3>
+        <p id="confirm-msg" class="text-xs text-muted mt-1"></p>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-700/40">
+        <button type="button" onclick="window.closeConfirm(false)" class="btn-ghost px-3.5 py-1.5 rounded-xl text-xs font-semibold">Annuler</button>
+        <button type="button" onclick="window.closeConfirm(true)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-500 text-white">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       PAGE D'ACCUEIL — ASSISTANT DE PREMIER PASSAGE (ONBOARDING 4 ÉTAPES)
+       ===================================================================== -->
+  <div id="onboarding-overlay" class="hidden fixed inset-0 z-50 overflow-y-auto p-3 sm:p-6 flex items-center justify-center no-print" style="background: rgba(3, 6, 14, 0.92); backdrop-filter: blur(12px);">
+    <div class="hud-card rounded-3xl max-w-2xl w-full p-5 sm:p-7 space-y-5 my-auto">
+      <!-- Header Onboarding -->
+      <div class="flex items-start justify-between gap-3 border-b pb-4" style="border-color: var(--border-sub);">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl flex items-center justify-center font-black text-lg btn-accent">H</div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg sm:text-xl font-extrabold text-bright tracking-tight">Bienvenue sur HARADA-BIO</h1>
+              <span class="text-[10px] mono-num px-2 py-0.5 rounded-full btn-soft">v6.0</span>
+            </div>
+            <p class="text-xs text-muted mt-0.5">Configure ton espace personnel en 1 minute. Tout reste stocké localement sur ton appareil.</p>
+          </div>
+        </div>
+        <button type="button" id="btn-close-onboarding" onclick="window.closeOnboarding()" class="hidden btn-ghost w-8 h-8 rounded-xl text-xs flex items-center justify-center" title="Fermer">✕</button>
+      </div>
+
+      <!-- Stepper Indicators -->
+      <div class="grid grid-cols-4 gap-1.5 text-[11px] font-bold">
+        <button type="button" onclick="window.goOnboardingStep(1)" id="ob-pill-1" class="py-1.5 px-2 rounded-xl border text-center transition">1. Profil</button>
+        <button type="button" onclick="window.goOnboardingStep(2)" id="ob-pill-2" class="py-1.5 px-2 rounded-xl border text-center transition">2. Style</button>
+        <button type="button" onclick="window.goOnboardingStep(3)" id="ob-pill-3" class="py-1.5 px-2 rounded-xl border text-center transition">3. Sport</button>
+        <button type="button" onclick="window.goOnboardingStep(4)" id="ob-pill-4" class="py-1.5 px-2 rounded-xl border text-center transition">4. Harada</button>
+      </div>
+
+      <!-- STEP 1 : PROFIL & BIOMÉTRIE -->
+      <div id="ob-step-1" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-muted uppercase mb-1">Ton Prénom / Indicatif</label>
+            <input type="text" id="ob-name" value="Opérateur" class="hud-input w-full px-3 py-2 rounded-xl text-sm font-semibold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-muted uppercase mb-1">Poids actuel (kg)</label>
+            <input type="number" step="0.1" id="ob-weight" value="81.0" class="hud-input w-full px-3 py-2 rounded-xl text-sm mono-num font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-muted uppercase mb-1">Taille (cm)</label>
+            <input type="number" id="ob-height" value="191" class="hud-input w-full px-3 py-2 rounded-xl text-sm mono-num font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-muted uppercase mb-1">Âge (ans)</label>
+            <input type="number" id="ob-age" value="23" class="hud-input w-full px-3 py-2 rounded-xl text-sm mono-num font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-muted uppercase mb-1">FC Repos estimée (bpm)</label>
+            <input type="number" id="ob-fcbase" value="50" class="hud-input w-full px-3 py-2 rounded-xl text-sm mono-num font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-muted uppercase mb-1">Objectif Sommeil (heures)</label>
+            <input type="number" step="0.5" id="ob-sleep" value="7.5" class="hud-input w-full px-3 py-2 rounded-xl text-sm mono-num font-bold">
+          </div>
+        </div>
+
+        <label class="hud-sub rounded-xl p-3 flex items-center justify-between gap-3 cursor-pointer">
+          <div>
+            <div class="text-xs font-bold text-bright">Mode Simplifié (sans prise de pouls FC)</div>
+            <div class="text-[11px] text-muted">Utile si tu ne veux noter que tes heures de sommeil et tes séances.</div>
+          </div>
+          <input type="checkbox" id="ob-simple-mode" class="w-4 h-4 accent-cyan-400">
+        </label>
+
+        <!-- Import rapide pour restaurer un profil existant (.json) -->
+        <div class="hud-sub rounded-xl p-3 flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs text-muted"><i class="fa-solid fa-file-import mr-1.5 text-accent"></i>Tu as déjà un fichier de sauvegarde <code class="mono-num">.json</code> ?</span>
+          <div>
+            <input type="file" id="ob-import-file" accept=".json" class="hidden" onchange="window.importJSONFile(event, true)">
+            <button type="button" onclick="document.getElementById('ob-import-file').click()" class="btn-soft px-3 py-1.5 rounded-xl text-xs">Importer mon .json</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 : STYLE VISUEL (5 THÈMES) -->
+      <div id="ob-step-2" class="hidden space-y-3">
+        <p class="text-xs text-muted">Clique sur un thème pour l'essayer immédiatement (modifiable à tout moment en haut de l'écran) :</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <button type="button" onclick="window.setTheme('cyber')" data-ob-theme="cyber" class="hud-sub p-3.5 rounded-2xl text-left flex items-center justify-between transition hover:scale-[1.01]">
+            <div>
+              <div class="text-sm font-bold text-bright">Cyber Cyan</div>
+              <div class="text-[11px] text-muted">HUD futuriste sombre & cyan/émeraude</div>
+            </div>
+            <span class="flex gap-1"><span class="w-4 h-4 rounded-full bg-[#060913] border border-cyan-400"></span><span class="w-4 h-4 rounded-full bg-cyan-400"></span></span>
+          </button>
+
+          <button type="button" onclick="window.setTheme('olive')" data-ob-theme="olive" class="hud-sub p-3.5 rounded-2xl text-left flex items-center justify-between transition hover:scale-[1.01]">
+            <div>
+              <div class="text-sm font-bold text-bright">Tactique Olive</div>
+              <div class="text-[11px] text-muted">Esprit terrain, kaki mat & ambre</div>
+            </div>
+            <span class="flex gap-1"><span class="w-4 h-4 rounded-full bg-[#0d120e] border border-lime-400"></span><span class="w-4 h-4 rounded-full bg-lime-400"></span></span>
+          </button>
+
+          <button type="button" onclick="window.setTheme('gold')" data-ob-theme="gold" class="hud-sub p-3.5 rounded-2xl text-left flex items-center justify-between transition hover:scale-[1.01]">
+            <div>
+              <div class="text-sm font-bold text-bright">Obsidienne & Or</div>
+              <div class="text-[11px] text-muted">Noir profond sobre & accents dorés</div>
+            </div>
+            <span class="flex gap-1"><span class="w-4 h-4 rounded-full bg-[#09090b] border border-amber-400"></span><span class="w-4 h-4 rounded-full bg-amber-400"></span></span>
+          </button>
+
+          <button type="button" onclick="window.setTheme('light')" data-ob-theme="light" class="hud-sub p-3.5 rounded-2xl text-left flex items-center justify-between transition hover:scale-[1.01]">
+            <div>
+              <div class="text-sm font-bold text-bright">Clair Minimaliste</div>
+              <div class="text-[11px] text-muted">Fond papier clair, lisible au soleil</div>
+            </div>
+            <span class="flex gap-1"><span class="w-4 h-4 rounded-full bg-white border border-sky-600"></span><span class="w-4 h-4 rounded-full bg-sky-600"></span></span>
+          </button>
+
+          <button type="button" onclick="window.setTheme('night-red')" data-ob-theme="night-red" class="hud-sub p-3.5 rounded-2xl text-left flex items-center justify-between transition hover:scale-[1.01] sm:col-span-2">
+            <div>
+              <div class="text-sm font-bold text-bright">🔴 Nuit Rouge (Zéro lumière bleue)</div>
+              <div class="text-[11px] text-muted">Spectre monochrome rouge pur pour préserver la mélatonine le soir</div>
+            </div>
+            <span class="flex gap-1"><span class="w-4 h-4 rounded-full bg-[#050000] border border-red-600"></span><span class="w-4 h-4 rounded-full bg-red-600"></span></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3 : MODÈLE SPORTIF -->
+      <div id="ob-step-3" class="hidden space-y-3">
+        <p class="text-xs text-muted">Choisis ton programme de départ (tu pourras ensuite modifier chaque exercice et créer tes propres séances) :</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <button type="button" onclick="window.selectOnboardingSport('calisthenics')" id="ob-sp-calisthenics" class="hud-sub p-3.5 rounded-2xl text-left space-y-1 transition">
+            <div class="text-sm font-bold text-bright"><i class="fa-solid fa-vest mr-1.5 text-accent"></i>Calisthénie & Gilet Lesté</div>
+            <p class="text-[11px] text-muted">Upper 1, Lutte, Lower 1 unilatéral (Pistol/Sissy/Mollets/Hip Thrust), BW2, Upper 2. Palier +2.4 kg.</p>
+          </button>
+
+          <button type="button" onclick="window.selectOnboardingSport('gym')" id="ob-sp-gym" class="hud-sub p-3.5 rounded-2xl text-left space-y-1 transition">
+            <div class="text-sm font-bold text-bright"><i class="fa-solid fa-dumbbell mr-1.5 text-accent"></i>Musculation Salle (Fonte)</div>
+            <p class="text-[11px] text-muted">Push / Pull / Legs sur barres et haltères (M₀ = 0 kg). Palier +2.5 kg.</p>
+          </button>
+
+          <button type="button" onclick="window.selectOnboardingSport('endurance')" id="ob-sp-endurance" class="hud-sub p-3.5 rounded-2xl text-left space-y-1 transition">
+            <div class="text-sm font-bold text-bright"><i class="fa-solid fa-person-running mr-1.5 text-accent"></i>Endurance & Sports Collectifs</div>
+            <p class="text-[11px] text-muted">Suivi par Durée + RPE Borg (Course, Vélo, Combat, Foot, Renfo léger).</p>
+          </button>
+
+          <button type="button" onclick="window.selectOnboardingSport('empty')" id="ob-sp-empty" class="hud-sub p-3.5 rounded-2xl text-left space-y-1 transition">
+            <div class="text-sm font-bold text-bright"><i class="fa-solid fa-sliders mr-1.5 text-accent"></i>Programme Vierge</div>
+            <p class="text-[11px] text-muted">Démarre sur des créneaux libres et ajoute uniquement tes propres exercices.</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 4 : GRILLE HARADA -->
+      <div id="ob-step-4" class="hidden space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold text-muted uppercase mb-1">Ton Objectif Central (au cœur de la grille 64)</label>
+          <input type="text" id="ob-harada-goal" value="EXCELLENCE GLOBALE" class="hud-input w-full px-3 py-2 rounded-xl text-sm font-extrabold uppercase tracking-wide">
+        </div>
+        <p class="text-xs text-muted">Choisis un modèle de départ pour tes 8 piliers et 64 actions (tout est éditable ensuite) :</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <button type="button" onclick="window.selectOnboardingHarada('equilibre')" id="ob-ha-equilibre" class="hud-sub p-3 rounded-2xl text-left space-y-1 transition">
+            <div class="text-xs font-bold text-bright">⚖️ Équilibre Global</div>
+            <p class="text-[11px] text-muted">8 piliers polyvalents (Corps, Mental, Organisation, Compétences, Relations, Créativité, Discipline, Vision).</p>
+          </button>
+          <button type="button" onclick="window.selectOnboardingHarada('athletique')" id="ob-ha-athletique" class="hud-sub p-3 rounded-2xl text-left space-y-1 transition">
+            <div class="text-xs font-bold text-bright">⚡ Performance Athlétique</div>
+            <p class="text-[11px] text-muted">Force, Endurance, Récupération, Nutrition, Mental, Mobilité, Technique, Hygiène.</p>
+          </button>
+          <button type="button" onclick="window.selectOnboardingHarada('vierge')" id="ob-ha-vierge" class="hud-sub p-3 rounded-2xl text-left space-y-1 transition">
+            <div class="text-xs font-bold text-bright">📝 Grille Vierge / IA</div>
+            <p class="text-[11px] text-muted">8 piliers libres prêts à remplir à la main ou via le générateur de prompt IA dans l'onglet Harada.</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer Navigation Onboarding -->
+      <div class="flex items-center justify-between pt-3 border-t" style="border-color: var(--border-sub);">
+        <button type="button" id="ob-btn-prev" onclick="window.stepOnboarding(-1)" class="btn-ghost px-4 py-2 rounded-xl text-xs font-bold">← Retour</button>
+        <div class="flex items-center gap-2">
+          <button type="button" id="ob-btn-next" onclick="window.stepOnboarding(1)" class="btn-accent px-5 py-2 rounded-xl text-xs">Suivant →</button>
+          <button type="button" id="ob-btn-finish" onclick="window.finishOnboarding()" class="hidden btn-accent px-5 py-2 rounded-xl text-xs">🚀 Lancer mon HARADA-BIO</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       TOP HEADER BAR (PROFIL + THÈME + FICHE A5 + 5 ONGLETS)
+       ===================================================================== -->
+  <header class="hud-header sticky top-0 z-40 no-print">
+    <div class="max-w-5xl mx-auto px-3 sm:px-5 py-2.5 space-y-2">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <!-- Brand & Profile Summary -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl btn-accent flex items-center justify-center font-black text-sm">H</div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-sm font-extrabold text-bright tracking-tight">HARADA<span class="text-accent">-BIO</span></span>
+              <span class="text-[10px] mono-num px-1.5 py-0.5 rounded btn-soft">v6.0</span>
+            </div>
+            <button type="button" onclick="window.toggleProfileDrawer()" class="text-[11px] text-muted hover:text-accent transition flex items-center gap-1 text-left">
+              <span id="hdr-profile-summary" class="mono-num">Opérateur • 81.0 kg • FC 50</span>
+              <i class="fa-solid fa-pen text-[9px]"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Tools: Theme Switcher + Night Red + A5 + Assistant -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <select id="sel-theme" onchange="window.setTheme(this.value)" class="hud-input px-2 py-1.5 rounded-xl text-[11px] font-bold cursor-pointer" title="Changer de style visuel">
+            <option value="cyber">💠 Cyber</option>
+            <option value="olive">🪖 Olive</option>
+            <option value="gold">⚜️ Or</option>
+            <option value="light">☀️ Clair</option>
+            <option value="night-red">🔴 Nuit Rouge</option>
+          </select>
+          <button type="button" onclick="window.toggleNightRedQuick()" id="btn-night-quick" class="btn-ghost px-2.5 py-1.5 rounded-xl text-[11px] font-bold" title="Bascule rapide Nuit Rouge (zéro lumière bleue)">🔴</button>
+          <button type="button" onclick="window.openA5Modal()" class="btn-ghost px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1" title="Imprimer la fiche papier A5 de la semaine">
+            <i class="fa-solid fa-print text-accent"></i> <span class="hidden sm:inline">Fiche A5</span>
+          </button>
+          <button type="button" onclick="window.openOnboarding()" class="btn-ghost px-2.5 py-1.5 rounded-xl text-[11px] font-bold" title="Ouvrir l'assistant de personnalisation">
+            <i class="fa-solid fa-wand-magic-sparkles text-accent"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 5 Short Tabs -->
+      <nav class="flex items-center gap-1 overflow-x-auto pb-0.5" role="tablist">
+        <button type="button" onclick="window.switchTab('jour')" id="tab-jour" class="tab-btn-active px-3 py-1.5 rounded-xl border text-xs font-bold whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-crosshairs text-[11px]"></i> Jour</button>
+        <button type="button" onclick="window.switchTab('courbes')" id="tab-courbes" class="btn-ghost px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-chart-line text-[11px]"></i> Courbes</button>
+        <button type="button" onclick="window.switchTab('prog')" id="tab-prog" class="btn-ghost px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-dumbbell text-[11px]"></i> Prog</button>
+        <button type="button" onclick="window.switchTab('harada')" id="tab-harada" class="btn-ghost px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-border-all text-[11px]"></i> Harada</button>
+        <button type="button" onclick="window.switchTab('donnees')" id="tab-donnees" class="btn-ghost px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-database text-[11px]"></i> Données</button>
+      </nav>
+
+      <!-- Collapsible Profile Editor -->
+      <div id="profile-drawer" class="hidden pt-2.5 pb-1 border-t" style="border-color: var(--border-sub);">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 items-end">
+          <div>
+            <label class="block text-[10px] uppercase text-muted font-bold mb-1">Nom</label>
+            <input type="text" id="prof-name" onchange="window.updateProfile('name', this.value)" class="hud-input w-full px-2 py-1.5 rounded-lg text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase text-muted font-bold mb-1">Poids (kg)</label>
+            <input type="number" step="0.1" id="prof-weight" onchange="window.updateProfile('weight', this.value)" class="hud-input w-full px-2 py-1.5 rounded-lg text-xs mono-num font-bold">
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase text-muted font-bold mb-1">Taille (cm)</label>
+            <input type="number" id="prof-height" onchange="window.updateProfile('height', this.value)" class="hud-input w-full px-2 py-1.5 rounded-lg text-xs mono-num font-bold">
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase text-muted font-bold mb-1">Âge</label>
+            <input type="number" id="prof-age" onchange="window.updateProfile('age', this.value)" class="hud-input w-full px-2 py-1.5 rounded-lg text-xs mono-num font-bold">
+          </div>
+          <div>
+            <div class="flex justify-between mb-1">
+              <label class="text-[10px] uppercase text-muted font-bold">FC Base 21j</label>
+              <button type="button" onclick="window.autoCalcFcBase()" class="text-[9px] text-accent underline font-bold">Auto</button>
+            </div>
+            <input type="number" id="prof-fcbase" onchange="window.updateProfile('fcBase', this.value)" class="hud-input w-full px-2 py-1.5 rounded-lg text-xs mono-num font-bold">
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase text-muted font-bold mb-1">Palier (+kg)</label>
+            <input type="number" step="0.1" id="prof-step" onchange="window.updateProfile('weightStep', this.value)" class="hud-input w-full px-2 py-1.5 rounded-lg text-xs mono-num font-bold" title="2.4 kg pour gilet, 2.5 kg pour barre">
+          </div>
+          <div class="flex items-end gap-1">
+            <label class="hud-sub px-2 py-1.5 rounded-lg flex items-center gap-1.5 text-[10px] font-bold cursor-pointer flex-1 justify-center">
+              <input type="checkbox" id="prof-simple" onchange="window.updateProfile('simpleMode', this.checked)" class="accent-cyan-400"> Sans FC
+            </label>
+            <button type="button" onclick="window.toggleProfileDrawer()" class="btn-accent px-2.5 py-1.5 rounded-lg text-xs">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       MAIN CONTENT
+       ===================================================================== -->
+  <main class="max-w-5xl mx-auto px-3 sm:px-5 pt-4 space-y-4 no-print">
+
+    <!-- DIAGNOSTIC BANNER -->
+    <section id="diag-banner" class="hud-card rounded-2xl p-3.5 sm:p-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div id="diag-icon-wrap" class="w-10 h-10 rounded-xl btn-soft flex items-center justify-center text-base shrink-0">
+            <i id="diag-icon" class="fa-solid fa-shield-heart"></i>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="diag-badge" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase btn-soft">Feu Vert • Prêt</span>
+              <span id="diag-subtag" class="text-[11px] mono-num text-muted">τ₂ eff: 10.0j • Dipping: -12 bpm</span>
+            </div>
+            <p id="diag-message" class="text-xs sm:text-sm font-medium text-bright mt-0.5">Récupération optimale.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <div class="hud-sub rounded-xl px-3 py-1.5 text-center min-w-[70px]">
+            <div class="text-[10px] uppercase text-muted font-bold">Récup</div>
+            <div id="kpi-irecup" class="text-base mono-num font-extrabold text-accent2">96%</div>
+          </div>
+          <div class="hud-sub rounded-xl px-3 py-1.5 text-center min-w-[72px]">
+            <div class="text-[10px] uppercase text-muted font-bold">Sommeil</div>
+            <div id="kpi-tst" class="text-base mono-num font-extrabold text-accent">7h18</div>
+          </div>
+          <div class="hud-sub rounded-xl px-3 py-1.5 text-center min-w-[72px]">
+            <div class="text-[10px] uppercase text-muted font-bold">Charge</div>
+            <div id="kpi-load" class="text-base mono-num font-extrabold text-bright">0 u.a.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         TAB 1 : JOUR
+         ================================================================= -->
+    <section id="view-jour" class="space-y-4">
+      <!-- CASE 1 : SOMMEIL & FC -->
+      <div class="hud-card rounded-2xl p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b" style="border-color: var(--border-sub);">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-lg btn-soft text-xs font-extrabold flex items-center justify-center">1</span>
+            <div>
+              <h2 class="text-sm sm:text-base font-bold text-bright">Récap Journée — Sommeil & FC</h2>
+              <span id="recap-status-line" class="text-[11px] mono-num text-muted">Sommeil continu par défaut</span>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <input type="date" id="inp-date" onchange="window.changeDate(this.value)" class="hud-input px-2.5 py-1.5 rounded-xl text-xs mono-num font-semibold cursor-pointer">
+            <button type="button" onclick="window.toggleSleepEditMode()" class="btn-ghost px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-pen-to-square text-accent"></i> <span id="lbl-edit-day">Réduire</span>
+            </button>
+            <button type="button" onclick="window.saveFullDay()" class="btn-accent px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-floppy-disk"></i> Enregistrer le jour
+            </button>
+          </div>
+        </div>
+
+        <!-- Locked summary -->
+        <div id="sleep-locked-summary" class="hidden grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <div class="hud-sub rounded-xl p-2.5"><div class="text-[10px] text-muted uppercase">Coucher</div><div id="sum-bed" class="text-sm mono-num font-bold text-bright mt-0.5">23:00</div></div>
+          <div class="hud-sub rounded-xl p-2.5"><div class="text-[10px] text-muted uppercase">Réveil</div><div id="sum-wake" class="text-sm mono-num font-bold text-accent2 mt-0.5">06:30</div></div>
+          <div class="hud-sub rounded-xl p-2.5"><div class="text-[10px] text-muted uppercase">Sommeil (TST)</div><div id="sum-tst" class="text-sm mono-num font-bold text-accent mt-0.5">7h18</div></div>
+          <div class="hud-sub rounded-xl p-2.5"><div class="text-[10px] text-muted uppercase">Sieste & Éveil</div><div id="sum-nap-waso" class="text-sm mono-num font-bold text-bright mt-0.5">0m • Continu</div></div>
+          <div class="hud-sub rounded-xl p-2.5"><div class="text-[10px] text-muted uppercase">Rituels</div><div id="sum-rituals" class="text-sm font-bold text-accent2 mt-0.5">📵 ☀️ 💧</div></div>
+        </div>
+
+        <!-- Editable body -->
+        <div id="sleep-edit-body" class="space-y-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- VEILLE -->
+            <div class="hud-sub rounded-xl p-3.5 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-accent"><i class="fa-solid fa-moon mr-1"></i> Veille au Soir</span>
+                <span class="text-[11px] mono-num text-muted">SOL: <strong id="lbl-sol" class="text-bright">12m</strong></span>
+              </div>
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-medium">Coucher</span>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="window.adjustTime('bedTime', -30)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">-30</button>
+                  <button type="button" onclick="window.adjustTime('bedTime', -15)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">-15</button>
+                  <input type="time" id="inp-bed-time" onchange="window.setTimeDirect('bedTime', this.value)" class="hud-input px-2 py-1 rounded-lg text-xs mono-num font-bold">
+                  <button type="button" onclick="window.adjustTime('bedTime', 15)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">+15</button>
+                  <button type="button" onclick="window.adjustTime('bedTime', 30)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">+30</button>
+                </div>
+              </div>
+              <div id="row-fc-bed" class="flex items-center justify-between gap-2">
+                <span class="text-xs font-medium">FC Coucher</span>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="window.adjustFC('fcBed', -5)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">-5</button>
+                  <button type="button" onclick="window.adjustFC('fcBed', -1)" class="btn-ghost px-2.5 py-1 rounded-lg text-xs mono-num font-bold">-</button>
+                  <input type="number" id="inp-fc-bed" onchange="window.setFCDirect('fcBed', this.value)" class="hud-input w-14 text-center py-1 rounded-lg text-xs mono-num font-bold">
+                  <button type="button" onclick="window.adjustFC('fcBed', 1)" class="btn-ghost px-2.5 py-1 rounded-lg text-xs mono-num font-bold">+</button>
+                  <button type="button" onclick="window.adjustFC('fcBed', 5)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">+5</button>
+                </div>
+              </div>
+              <div class="pt-1.5 border-t flex items-center justify-between" style="border-color: var(--border-sub);">
+                <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold">
+                  <input type="checkbox" id="chk-fast-sleep" onchange="window.toggleFastSleep(this.checked)" class="w-4 h-4 accent-cyan-400">
+                  Endormissement rapide (&lt; 10 min)
+                </label>
+                <span id="lbl-fast-sleep-tag" class="text-[10px] mono-num text-muted">Auto</span>
+              </div>
+            </div>
+
+            <!-- MATIN -->
+            <div class="hud-sub rounded-xl p-3.5 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-accent2"><i class="fa-solid fa-sun mr-1"></i> Matin au Lever</span>
+                <span class="text-[11px] mono-num text-muted">Au lit: <strong id="lbl-tib" class="text-bright">7h30</strong></span>
+              </div>
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-medium">Réveil</span>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="window.adjustTime('wakeTime', -30)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">-30</button>
+                  <button type="button" onclick="window.adjustTime('wakeTime', -15)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">-15</button>
+                  <input type="time" id="inp-wake-time" onchange="window.setTimeDirect('wakeTime', this.value)" class="hud-input px-2 py-1 rounded-lg text-xs mono-num font-bold">
+                  <button type="button" onclick="window.adjustTime('wakeTime', 15)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">+15</button>
+                  <button type="button" onclick="window.adjustTime('wakeTime', 30)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">+30</button>
+                </div>
+              </div>
+              <div id="row-fc-wake" class="flex items-center justify-between gap-2">
+                <span class="text-xs font-medium">FC Lever</span>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="window.adjustFC('fcWake', -5)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">-5</button>
+                  <button type="button" onclick="window.adjustFC('fcWake', -1)" class="btn-ghost px-2.5 py-1 rounded-lg text-xs mono-num font-bold">-</button>
+                  <input type="number" id="inp-fc-wake" onchange="window.setFCDirect('fcWake', this.value)" class="hud-input w-14 text-center py-1 rounded-lg text-xs mono-num font-bold">
+                  <button type="button" onclick="window.adjustFC('fcWake', 1)" class="btn-ghost px-2.5 py-1 rounded-lg text-xs mono-num font-bold">+</button>
+                  <button type="button" onclick="window.adjustFC('fcWake', 5)" class="btn-ghost px-2 py-1 rounded-lg text-[11px] mono-num font-bold">+5</button>
+                </div>
+              </div>
+              <div id="row-fc-delta" class="pt-1.5 border-t flex items-center justify-between text-[11px]" style="border-color: var(--border-sub);">
+                <span class="text-muted">Écart vs FC Base (<span id="lbl-fcbase-inline" class="mono-num text-accent">50</span>)</span>
+                <span id="lbl-fcdelta-inline" class="mono-num font-bold text-accent2">0 bpm</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Éveil + Sieste + Rituels -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
+            <div class="hud-sub rounded-xl px-3 py-2.5 space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold">
+                  <input type="checkbox" id="chk-awakening" onchange="window.toggleAwakening(this.checked)" class="w-4 h-4 accent-amber-400">
+                  Éveil inopiné ?
+                </label>
+                <span id="lbl-waso-badge" class="text-[11px] mono-num font-bold text-accent2">Continu (0m)</span>
+              </div>
+              <div id="waso-adjust-bar" class="hidden flex items-center justify-between gap-1.5 text-[11px] mono-num">
+                <span id="lbl-awakening-phase" class="text-amber-400 font-bold truncate">Milieu</span>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="window.adjustAwakeningTime(-15)" class="btn-ghost px-1.5 py-0.5 rounded font-bold">-15</button>
+                  <input type="time" id="inp-awakening-time" onchange="window.setAwakeningTimeDirect(this.value)" class="hud-input px-1.5 py-0.5 rounded text-[11px] font-bold">
+                  <button type="button" onclick="window.adjustAwakeningTime(15)" class="btn-ghost px-1.5 py-0.5 rounded font-bold">+15</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="hud-sub rounded-xl px-3 py-2.5 flex items-center justify-between gap-2">
+              <span class="text-xs font-semibold"><i class="fa-solid fa-bolt text-accent mr-1"></i> Sieste</span>
+              <div class="flex items-center gap-1 mono-num text-[11px]">
+                <button type="button" id="btn-nap-0" onclick="window.setNap(0)" class="px-2 py-1 rounded-lg font-bold">0m</button>
+                <button type="button" id="btn-nap-20" onclick="window.setNap(20)" class="px-2 py-1 rounded-lg font-bold">+20</button>
+                <button type="button" id="btn-nap-30" onclick="window.setNap(30)" class="px-2 py-1 rounded-lg font-bold">+30</button>
+                <button type="button" id="btn-nap-90" onclick="window.setNap(90)" class="px-2 py-1 rounded-lg font-bold">+90</button>
+              </div>
+            </div>
+
+            <div class="hud-sub rounded-xl px-3 py-2.5 flex items-center justify-between gap-1.5">
+              <button type="button" id="btn-rit-paper" onclick="window.toggleRitual('paper')" class="flex-1 py-1 rounded-lg text-[11px] font-bold border transition">📵 Papier</button>
+              <button type="button" id="btn-rit-sun" onclick="window.toggleRitual('sun')" class="flex-1 py-1 rounded-lg text-[11px] font-bold border transition">☀️ Soleil</button>
+              <button type="button" id="btn-rit-water" onclick="window.toggleRitual('water')" class="flex-1 py-1 rounded-lg text-[11px] font-bold border transition">💧 Eau</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASE 2 : SPORT MODULAIRE + EXPRESS 20' -->
+      <div class="hud-card rounded-2xl p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b" style="border-color: var(--border-sub);">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-lg btn-soft text-xs font-extrabold flex items-center justify-center">2</span>
+            <div>
+              <h2 class="text-sm sm:text-base font-bold text-bright">Entraînement du Jour</h2>
+              <span class="text-[11px] text-muted">Modulaire • Unilatéral D/G • Express 20'</span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" onclick="window.toggleExpress20()" id="btn-express20" class="btn-ghost px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1" title="Réduit à 2 séries (S1+S2) en gardant 100% de la charge">
+              ⚡ Express 20'
+            </button>
+            <button type="button" onclick="window.toggleTaper()" id="btn-taper" class="btn-ghost px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1">
+              <i class="fa-solid fa-feather"></i> Affûtage
+            </button>
+            <button type="button" onclick="window.saveWorkoutOnly()" class="btn-accent px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-check"></i> Enregistrer séance
+            </button>
+          </div>
+        </div>
+
+        <!-- Day Picker -->
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+          <button type="button" onclick="window.selectDaySlot('lundi')" id="day-btn-lundi" class="py-1.5 px-2 rounded-xl text-xs font-bold border transition">Lundi</button>
+          <button type="button" onclick="window.selectDaySlot('mardi')" id="day-btn-mardi" class="py-1.5 px-2 rounded-xl text-xs font-bold border transition">Mardi</button>
+          <button type="button" onclick="window.selectDaySlot('mercredi')" id="day-btn-mercredi" class="py-1.5 px-2 rounded-xl text-xs font-bold border transition">Mercredi</button>
+          <button type="button" onclick="window.selectDaySlot('jeudi')" id="day-btn-jeudi" class="py-1.5 px-2 rounded-xl text-xs font-bold border transition">Jeudi</button>
+          <button type="button" onclick="window.selectDaySlot('vendredi')" id="day-btn-vendredi" class="py-1.5 px-2 rounded-xl text-xs font-bold border transition">Vendredi</button>
+          <button type="button" onclick="window.selectDaySlot('repos')" id="day-btn-repos" class="py-1.5 px-2 rounded-xl text-xs font-bold border transition">Sam/Dim</button>
+        </div>
+
+        <!-- Preset + Time + Duration -->
+        <div class="hud-sub rounded-xl p-3 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+          <div class="md:col-span-5 flex items-center gap-2">
+            <span class="text-[11px] uppercase text-muted font-bold shrink-0">Séance</span>
+            <select id="sel-session-preset" onchange="window.applySessionPreset(this.value)" class="hud-input flex-1 px-2.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer"></select>
+          </div>
+          <div class="md:col-span-4 flex items-center justify-between md:justify-center gap-1.5">
+            <span class="text-[11px] uppercase text-muted font-bold">Heure</span>
+            <input type="time" id="inp-sport-time" onchange="window.setSportTime(this.value)" class="hud-input px-2 py-1 rounded-lg text-xs mono-num font-bold">
+            <button type="button" onclick="window.setSportTime('12:15')" class="btn-ghost px-2 py-1 rounded-lg text-[10px] font-bold">Midi</button>
+            <button type="button" onclick="window.setSportTime('18:00')" class="btn-ghost px-2 py-1 rounded-lg text-[10px] font-bold">18h</button>
+          </div>
+          <div class="md:col-span-3 flex items-center justify-between md:justify-end gap-1.5">
+            <span class="text-[11px] uppercase text-muted font-bold">Durée</span>
+            <button type="button" onclick="window.adjustSportDuration(-5)" class="btn-ghost px-2 py-1 rounded-lg text-xs mono-num font-bold">-</button>
+            <input type="number" id="inp-sport-duration" onchange="window.setSportDuration(this.value)" class="hud-input w-12 text-center py-1 rounded-lg text-xs mono-num font-bold">
+            <button type="button" onclick="window.adjustSportDuration(5)" class="btn-ghost px-2 py-1 rounded-lg text-xs mono-num font-bold">+</button>
+          </div>
+        </div>
+
+        <!-- Exercises List -->
+        <div id="exercises-list" class="space-y-3"></div>
+
+        <!-- Add Exercise / Custom Free Exercise -->
+        <div class="pt-3 border-t space-y-2" style="border-color: var(--border-sub);">
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="sel-add-exo" class="hud-input flex-1 min-w-[220px] px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer"></select>
+            <button type="button" onclick="window.addSelectedExercise()" class="btn-soft px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5">+ Ajouter</button>
+            <button type="button" onclick="window.resetDayToDefault()" class="btn-ghost px-3 py-2 rounded-xl text-xs font-semibold">Réinit.</button>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <input type="text" id="inp-custom-exo-name" placeholder="Ou crée ton propre exercice (ex: Développé couché, Course 30', Gainage)..." class="hud-input flex-1 min-w-[200px] px-3 py-1.5 rounded-xl text-xs">
+            <select id="sel-custom-exo-type" class="hud-input px-2.5 py-1.5 rounded-xl text-xs font-semibold">
+              <option value="rpt_gym">Fonte / Barre (M₀ = 0 kg)</option>
+              <option value="rpt_bw">Poids du corps + Gilet</option>
+              <option value="rpt_uni">Unilatéral D/G</option>
+              <option value="cardio">Cardio / RPE</option>
+              <option value="prophylaxis">Bloc rapide (Cocher)</option>
+            </select>
+            <button type="button" onclick="window.addCustomExercise()" class="btn-ghost px-3 py-1.5 rounded-xl text-xs font-bold">+ Exo libre</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASE 3 : COMPLÉMENTATION -->
+      <div class="hud-card rounded-2xl p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg btn-soft text-xs font-extrabold flex items-center justify-center">3</span>
+            <h2 class="text-sm font-bold text-bright">Complémentation</h2>
+            <span class="text-[10px] text-muted px-2 py-0.5 rounded-full hud-sub">En veille</span>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" id="supp-rhodiola" onclick="window.toggleSupp('rhodiola')" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition">🌿 Rhodiole</button>
+          <button type="button" id="supp-creatine" onclick="window.toggleSupp('creatine')" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition">🧪 Créatine</button>
+          <button type="button" id="supp-magnesium" onclick="window.toggleSupp('magnesium')" class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition">💊 Magnésium</button>
+          <input type="text" id="inp-supp-note" onchange="window.setSuppNote(this.value)" placeholder="Note libre (dosage, heure)..." class="hud-input flex-1 min-w-[180px] px-3 py-1.5 rounded-xl text-xs">
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         TAB 2 : COURBES
+         ================================================================= -->
+    <section id="view-courbes" class="hidden space-y-4">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="hud-card rounded-2xl p-3.5"><div class="text-[10px] uppercase text-muted font-bold">Busso (k₂/k₁)</div><div id="gauge-k2k1" class="text-xl mono-num font-extrabold text-accent2 mt-1">0.72</div></div>
+        <div class="hud-card rounded-2xl p-3.5"><div class="text-[10px] uppercase text-muted font-bold">Tendons (IDMT)</div><div id="gauge-idmt" class="text-xl mono-num font-extrabold text-accent mt-1">1.03</div></div>
+        <div class="hud-card rounded-2xl p-3.5"><div class="text-[10px] uppercase text-muted font-bold">Équilibre Épaule</div><div id="gauge-scap" class="text-xl mono-num font-extrabold text-accent2 mt-1">0.36</div></div>
+        <div class="hud-card rounded-2xl p-3.5"><div class="text-[10px] uppercase text-muted font-bold">τ₂ Dissipation</div><div id="gauge-tau2" class="text-xl mono-num font-extrabold text-bright mt-1">10.0 j</div></div>
+      </div>
+
+      <div class="hud-card rounded-2xl p-4 sm:p-5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-sm font-bold text-bright">Force 1-RM (Berger) vs Récupération</h3>
+          <select id="chart-exo-select" onchange="window.renderCharts()" class="hud-input px-3 py-1.5 rounded-xl text-xs font-bold"></select>
+        </div>
+        <div class="relative w-full h-64 hud-sub rounded-xl p-2"><canvas id="chart-progression"></canvas></div>
+      </div>
+
+      <div class="hud-card rounded-2xl p-4 sm:p-5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-sm font-bold text-bright">Cinétique Muscle (τ₁=21.5j) vs Tendons (65j)</h3>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" onclick="window.simulateWeek('normal')" class="btn-soft px-2.5 py-1 rounded-lg text-[11px]">+1 Sem. Normale</button>
+            <button type="button" onclick="window.simulateWeek('sleep_debt')" class="btn-ghost px-2.5 py-1 rounded-lg text-[11px] font-bold text-rose-400">+1 Sem. Nuits 5h</button>
+            <button type="button" onclick="window.simulateWeek('taper')" class="btn-ghost px-2.5 py-1 rounded-lg text-[11px] font-bold">+1 Sem. Affûtage</button>
+          </div>
+        </div>
+        <div class="relative w-full h-56 hud-sub rounded-xl p-2"><canvas id="chart-tendon"></canvas></div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         TAB 3 : PROG & ABAQUES
+         ================================================================= -->
+    <section id="view-prog" class="hidden space-y-4">
+      <div class="hud-card rounded-2xl p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-sub);">
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-bright">Abaques Biomécaniques & Programme</h2>
+            <p class="text-xs text-muted">Calculés en direct sur ton poids (<span id="prog-weight-lbl" class="mono-num text-accent font-bold">81.0 kg</span>) • Incrément : <span id="prog-step-lbl" class="mono-num text-accent2 font-bold">+2.4 kg</span></p>
+          </div>
+          <button type="button" onclick="window.openA5Modal()" class="btn-soft px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5">
+            <i class="fa-solid fa-print"></i> Fiche Papier A5
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b text-[10px] uppercase text-muted" style="border-color: var(--border-sub);">
+                <th class="py-2 pr-3">Exercice</th>
+                <th class="py-2 px-2">Type</th>
+                <th class="py-2 px-2">Masse M₀</th>
+                <th class="py-2 pl-2">Note</th>
+              </tr>
+            </thead>
+            <tbody id="biomech-table-body" class="divide-y divide-slate-800/40 mono-num"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         TAB 4 : HARADA (HILL >= 5 MOIS + DÉCROISSANCE Δt + ARCHIVES RADAR)
+         ================================================================= -->
+    <section id="view-harada" class="hidden space-y-4">
+      <div class="hud-card rounded-2xl p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b pb-3" style="border-color: var(--border-sub);">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl btn-soft flex items-center justify-center text-base shrink-0"><i class="fa-solid fa-mountain"></i></div>
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-accent font-extrabold">Objectif Central Harada • Courbe Hill (≥ 5 mois)</div>
+              <input type="text" id="inp-harada-goal" onchange="window.updateHaradaGoal(this.value)" class="bg-transparent text-base sm:text-lg font-black text-bright outline-none uppercase w-full sm:w-72">
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="hud-sub rounded-xl px-3 py-1.5 text-center">
+              <div class="text-[9px] uppercase text-muted font-bold">Score Géom.</div>
+              <div id="harada-central-score" class="text-base mono-num font-extrabold text-accent">0.0%</div>
+            </div>
+            <div class="flex items-center p-1 rounded-xl hud-sub gap-1">
+              <button type="button" id="btn-hview-matrix" onclick="window.setHaradaView('matrix')" class="px-3 py-1 rounded-lg text-xs font-bold">Matrice 9×9</button>
+              <button type="button" id="btn-hview-focus" onclick="window.setHaradaView('focus')" class="px-3 py-1 rounded-lg text-xs font-bold">Radar & Archives</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barre Outils Harada (Simulateur +10j + Générateur IA) -->
+        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
+          <div class="flex flex-wrap items-center gap-1.5 mono-num">
+            <span class="hud-sub px-2 py-1 rounded-lg text-accent2 font-bold">Lally ≥150u (tol. 2j)</span>
+            <span class="hud-sub px-2 py-1 rounded-lg text-accent font-bold">ACT-R ≥55u (2-7j)</span>
+            <span class="hud-sub px-2 py-1 rounded-lg font-bold" style="color:var(--accent-warn)">Phys ≥65u (tol. 3j)</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" onclick="window.simulateHaradaOffset(10)" class="btn-ghost px-2.5 py-1 rounded-lg font-bold" title="Tester la décroissance Δt">+10j Simu (<span id="lbl-sim-offset">0</span>j)</button>
+            <button type="button" onclick="window.resetHaradaOffset()" class="btn-ghost px-2 py-1 rounded-lg font-bold">↻ 0j</button>
+            <button type="button" onclick="window.copyAiHaradaPrompt()" class="btn-soft px-2.5 py-1 rounded-lg font-bold"><i class="fa-solid fa-robot mr-1"></i>Prompt IA Grille</button>
+          </div>
+        </div>
+
+        <!-- VUE MATRICE 9x9 -->
+        <div id="harada-view-matrix" class="space-y-4">
+          <div class="overflow-x-auto pb-1">
+            <div id="harada-mandala-container" class="harada-macro-grid min-w-[680px]"></div>
+          </div>
+          <div id="harada-cell-inspector" class="hud-sub rounded-xl p-4 space-y-3"></div>
+        </div>
+
+        <!-- VUE FOCUS, RADAR & ARCHIVES M vs M-1 -->
+        <div id="harada-view-focus" class="hidden space-y-4">
+          <!-- Archives bar -->
+          <div class="hud-sub rounded-xl p-3 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="window.snapshotHaradaMonth()" class="btn-soft px-3 py-1.5 rounded-xl text-xs">📸 Figer le mois actuel</button>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-muted">Comparer avec :</span>
+              <select id="sel-harada-archive" onchange="window.renderHarada()" class="hud-input px-2.5 py-1.5 rounded-xl text-xs font-bold"></select>
+              <button type="button" onclick="window.deleteSelectedArchive()" class="btn-ghost px-2 py-1.5 rounded-xl text-xs text-rose-400">🗑️</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div class="lg:col-span-6 hud-sub rounded-xl p-4">
+              <div class="text-xs font-bold text-bright mb-2">Radar 8 Piliers (Actuel vs Archive)</div>
+              <div class="relative w-full h-72"><canvas id="chart-harada-radar"></canvas></div>
+            </div>
+            <div class="lg:col-span-6 hud-sub rounded-xl p-4 space-y-3">
+              <div class="text-xs font-bold text-bright">Écarts par Pilier & Édition des Noms</div>
+              <div id="harada-archive-table" class="space-y-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         TAB 5 : DONNÉES
+         ================================================================= -->
+    <section id="view-donnees" class="hidden space-y-4">
+      <div class="hud-card rounded-2xl p-4 sm:p-5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-sm sm:text-base font-bold text-bright">Journal Enregistré</h2>
+          <button type="button" onclick="window.purgeHistory()" class="btn-ghost px-3 py-1.5 rounded-xl text-xs font-bold text-amber-400">Purger l'historique</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b text-[10px] uppercase text-muted" style="border-color: var(--border-sub);">
+                <th class="py-2 pr-2">Date</th>
+                <th class="py-2 px-2">TST</th>
+                <th class="py-2 px-2">FC C/L</th>
+                <th class="py-2 px-2">Récup</th>
+                <th class="py-2 px-2">Séance</th>
+                <th class="py-2 pl-2 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body" class="divide-y divide-slate-800/40 mono-num"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="hud-card rounded-2xl p-4 sm:p-5 space-y-3">
+        <h3 class="text-sm font-bold text-bright">Sauvegarde, Partage & Import (.json)</h3>
+        <p class="text-xs text-muted">Exporte ton profil personnel (ex: <code class="mono-num">mon_profil.json</code>) pour le sauvegarder avant toute mise à jour ou pour changer d'appareil.</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="window.downloadJSON()" class="btn-accent px-3.5 py-2 rounded-xl text-xs"><i class="fa-solid fa-download mr-1"></i>Télécharger .json</button>
+          <input type="file" id="file-import-main" accept=".json" class="hidden" onchange="window.importJSONFile(event, false)">
+          <button type="button" onclick="document.getElementById('file-import-main').click()" class="btn-soft px-3.5 py-2 rounded-xl text-xs"><i class="fa-solid fa-upload mr-1"></i>Importer un .json</button>
+          <button type="button" onclick="window.openOnboarding()" class="btn-ghost px-3.5 py-2 rounded-xl text-xs font-bold"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-accent"></i>Relancer l'Accueil</button>
+          <button type="button" onclick="window.requestResetAll()" class="ml-auto btn-ghost px-3.5 py-2 rounded-xl text-xs font-bold text-rose-400">Réinitialiser tout</button>
+        </div>
+        <div class="pt-2 space-y-2">
+          <textarea id="json-io-box" rows="3" placeholder="Colle ici un JSON complet ou une grille Harada générée par IA..." class="hud-input w-full p-2.5 rounded-xl text-[11px] mono-num"></textarea>
+          <button type="button" onclick="window.importJSONText()" class="btn-ghost px-3 py-1.5 rounded-xl text-xs font-bold">Importer depuis le texte</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =====================================================================
+       MODALE FICHE PAPIER A5 IMPRIMABLE
+       ===================================================================== -->
+  <div id="modal-a5" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="hud-card rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+      <div id="modal-a5-chrome" class="p-3.5 border-b flex items-center justify-between" style="border-color: var(--border-sub);">
+        <span class="text-xs font-bold text-bright">🖨️ Aperçu Fiche Papier Hebdomadaire (Format A5 Portrait)</span>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="window.print()" class="btn-accent px-3.5 py-1.5 rounded-xl text-xs">Imprimer / PDF A5</button>
+          <button type="button" onclick="window.closeA5Modal()" class="btn-ghost px-2.5 py-1.5 rounded-xl text-xs font-bold">✕</button>
+        </div>
+      </div>
+      <div class="p-4 overflow-y-auto bg-slate-900 flex justify-center">
+        <div id="a5-sheet" class="w-[148mm] min-h-[200mm] bg-white text-black p-4 font-sans text-[10px] space-y-3 border border-slate-300">
+          <div class="border-b-2 border-black pb-1.5 flex justify-between items-end">
+            <div>
+              <div class="font-extrabold text-sm tracking-wide">HARADA-BIO • FICHE SEMAINE A5</div>
+              <div class="text-[9px] text-gray-700">Carnet Matinal Sans Écran & Charges Cibles</div>
+            </div>
+            <div class="text-right text-[9px] font-mono">
+              <div><strong id="a5-user">Opérateur</strong> • <span id="a5-weight">81.0</span> kg</div>
+              <div>Semaine du : ____ / ____ / 2026</div>
+            </div>
+          </div>
+          <div>
+            <div class="font-bold uppercase text-[9.5px] bg-gray-200 px-1.5 py-0.5 border border-black">1. Sommeil & FC Lever (Allongé 1 min)</div>
+            <table class="w-full text-[9px] text-center border-collapse mt-1">
+              <thead>
+                <tr class="bg-gray-100">
+                  <th class="border border-black p-1">Jour</th><th class="border border-black p-1">Coucher</th><th class="border border-black p-1">FC C.</th>
+                  <th class="border border-black p-1">Réveil</th><th class="border border-black p-1">FC L.</th><th class="border border-black p-1">Éveil</th>
+                  <th class="border border-black p-1">Sieste</th><th class="border border-black p-1">📵 ☀️ 💧</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="border border-black p-1 font-bold">Lun</td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black">[ ][ ][ ]</td></tr>
+                <tr><td class="border border-black p-1 font-bold">Mar</td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black">[ ][ ][ ]</td></tr>
+                <tr><td class="border border-black p-1 font-bold">Mer</td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black">[ ][ ][ ]</td></tr>
+                <tr><td class="border border-black p-1 font-bold">Jeu</td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black">[ ][ ][ ]</td></tr>
+                <tr><td class="border border-black p-1 font-bold">Ven</td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black">[ ][ ][ ]</td></tr>
+                <tr><td class="border border-black p-1 font-bold">Sam</td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black">[ ][ ][ ]</td></tr>
+                <tr><td class="border border-black p-1 font-bold">Dim</td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black">:</td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black">[ ][ ][ ]</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div class="font-bold uppercase text-[9.5px] bg-gray-200 px-1.5 py-0.5 border border-black">2. Séances & Charges Cibles de la Semaine</div>
+            <table class="w-full text-[8.5px] border-collapse mt-1">
+              <thead><tr class="bg-gray-100"><th class="border border-black p-1 text-left">Jour / Séance</th><th class="border border-black p-1 text-left">Exercices & Charges Actuelles</th><th class="border border-black p-1 w-10 text-center">OK</th></tr></thead>
+              <tbody id="a5-workouts-body"></tbody>
+            </table>
+          </div>
+          <div class="border border-black p-2 space-y-1.5">
+            <div class="font-bold uppercase text-[9px] border-b border-black pb-0.5">3. Priorités Harada (<span id="a5-goal">EXCELLENCE</span>) & RETEX</div>
+            <div class="h-4 border-b border-gray-300 text-[8px] text-gray-500">Priorité 1 :</div>
+            <div class="h-4 border-b border-gray-300 text-[8px] text-gray-500">Priorité 2 :</div>
+            <div class="h-5 text-[8px] text-gray-500">RETEX Semaine :</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MOTEUR JAVASCRIPT COMPLET (HARADA-BIO v6.0)
+       ===================================================================== -->
+  <script>
+  (function() {
+    'use strict';
+    const STORAGE_KEY = 'HARADA_BIO_V6_0';
+
+    // -----------------------------------------------------------------------
+    // 2. TEMPLATES HARADA (3 MODÈLES PUBLICS NEUTRES)
+    // -----------------------------------------------------------------------
+    function makeHaradaCell(id, name, engine, subTexts) {
+      return {
+        id, name, engine: engine || 'lally',
+        units: 0, score: 0, reps: 0, lastDone: null,
+        subActions: (subTexts || ['Critère mesurable 1', 'Critère mesurable 2', 'Critère mesurable 3']).map((text, idx) => ({ id:'s'+idx, text, count:0, lastDone:null }))
+      };
+    }
+
+    function buildHaradaTemplate(tplKey) {
+      const palette = ['#10b981','#22d3ee','#f59e0b','#818cf8','#f43f5e','#fb923c','#a855f7','#38bdf8'];
+      const icons = ['fa-heart-pulse','fa-shield-halved','fa-compass','fa-crosshairs','fa-hands-praying','fa-bolt','fa-scale-balanced','fa-eye'];
+
+      if (tplKey === 'athletique') {
+        const names = ['FORCE','ENDURANCE','RÉCUPÉRATION','NUTRITION','MENTAL','MOBILITÉ','TECHNIQUE','HYGIÈNE'];
+        return names.map((n, i) => ({
+          id:i, name:n, color:palette[i], icon:icons[i],
+          cells: Array.from({length:8}, (_, j) => makeHaradaCell(j, `${n} • Action ${j+1}`, i%3===0?'phys':(i%3===1?'lally':'actr')))
+        }));
+      }
+
+      if (tplKey === 'vierge') {
+        return Array.from({length:8}, (_, i) => ({
+          id:i, name:`PILIER ${i+1}`, color:palette[i], icon:icons[i],
+          cells: Array.from({length:8}, (_, j) => makeHaradaCell(j, `Action ${j+1}`, 'lally'))
+        }));
+      }
+
+      // Défaut : Équilibre Global
+      const eq = [
+        ['CORPS', ['Séances sport','Sommeil régulier','Hydratation','Nutrition propre','Mobilité','Marche / Dehors','Respiration','Posture']],
+        ['MENTAL', ['Zéro écran matin','Focus profond','Gestion du stress','Règle des 2 min','Persévérance','Auto-discipline','Calme sous pression','Gratitude']],
+        ['ORGANISATION', ['Planifier la veille','3 priorités/jour','Ponctualité','Espace rangé','Gestion budget','Zéro procrastination','Revue semaine','Plan B']],
+        ['COMPÉTENCES', ['Lecture quotidienne','Langue étrangère','Écriture / Synthèse','Compétence métier','Compétence manuelle','Mémoire active','Curiosité','Esprit critique']],
+        ['RELATIONS', ['Famille','Écoute active','Amis proches','Aider un proche','Clarté des demandes','Politesse','Réseau','Loyauté']],
+        ['CRÉATIVITÉ', ['Temps d\'ennui','Carnet d\'idées','Dessin / Schéma','Nouvelle expérience','Sortir du confort','Culture générale','Projet perso','Expérimentation']],
+        ['DISCIPLINE', ['Tenir ses promesses','Travail régulier','Soin du matériel','Finir ce qu\'on lance','Précision','Responsabilité','Courage','Exemplarité']],
+        ['VISION', ['Prendre du recul','Objectifs trimestriels','RETEX hebdo','Demander conseil','Actualité de fond','Alignement valeurs','Long terme','Transmission']]
+      ];
+      return eq.map((d, i) => ({ id:i, name:d[0], color:palette[i], icon:icons[i], cells:d[1].map((name, j) => makeHaradaCell(j, name, i===0?'phys':(j%3===0?'actr':'lally'))) }));
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. STATE & PERSISTENCE
+    // -----------------------------------------------------------------------
+    function getTodayISO() {
+      const d = new Date();
+      return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+    }
+    function getDaySlotFromISO(iso) {
+      const [y,m,d] = iso.split('-').map(Number);
+      const dow = new Date(y, m-1, d).getDay();
+      return ['repos','lundi','mardi','mercredi','jeudi','vendredi','repos'][dow] || 'lundi';
+    }
+
+    function buildDefaultState() {
+      const today = getTodayISO();
+      const workoutsByDay = {};
+      Object.entries(SPORT_TEMPLATES.calisthenics.map).forEach(([d, p]) => workoutsByDay[d] = buildPresetDay(p));
+      return {
+        onboarded: false,
+        theme: 'cyber',
+        prevTheme: 'cyber',
+        activeTab: 'jour',
+        profileDrawerOpen: false,
+        sleepEditOpen: true,
+        currentDate: today,
+        currentDay: getDaySlotFromISO(today),
+        express20: false,
+        taperMode: false,
+        haradaGoal: 'EXCELLENCE GLOBALE',
+        haradaView: 'matrix',
+        selectedHaradaCell: { pIdx:0, cIdx:0 },
+        simDayOffset: 0,
+        haradaArchives: [],
+        profile: { name:'Opérateur', weight:81.0, height:191, age:23, fcBase:50, targetSleep:7.5, weightStep:2.4, simpleMode:false, sportTemplate:'calisthenics' },
+        today: { bedTime:'23:00', wakeTime:'06:30', fcBed:62, fcWake:50, fastSleep:false, nightAwakening:false, awakeningTime:'03:15', napMin:0, rituals:{paper:true,sun:true,water:true}, supps:{rhodiola:false,creatine:false,magnesium:false,note:''} },
+        workoutsByDay,
+        history: [],
+        harada: buildHaradaTemplate('equilibre')
+      };
+    }
+
+    let state = buildDefaultState();
+    let obStep = 1, obSport = 'calisthenics', obHarada = 'equilibre';
+    let chartProg = null, chartTend = null, chartRadar = null, confirmCb = null;
+
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = Object.assign(buildDefaultState(), parsed);
+          state.profile = Object.assign(buildDefaultState().profile, parsed.profile || {});
+          state.today = Object.assign(buildDefaultState().today, parsed.today || {});
+        }
+      } catch(e) {}
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. ONBOARDING (PAGE D'ACCUEIL PREMIER PASSAGE)
+    // -----------------------------------------------------------------------
+    window.openOnboarding = function() {
+      obStep = 1;
+      document.getElementById('ob-name').value = state.profile.name;
+      document.getElementById('ob-weight').value = state.profile.weight;
+      document.getElementById('ob-height').value = state.profile.height;
+      document.getElementById('ob-age').value = state.profile.age;
+      document.getElementById('ob-fcbase').value = state.profile.fcBase;
+      document.getElementById('ob-sleep').value = state.profile.targetSleep;
+      document.getElementById('ob-simple-mode').checked = !!state.profile.simpleMode;
+      document.getElementById('ob-harada-goal').value = state.haradaGoal || 'EXCELLENCE GLOBALE';
+      document.getElementById('btn-close-onboarding').classList.toggle('hidden', !state.onboarded);
+      document.getElementById('onboarding-overlay').classList.remove('hidden');
+      window.selectOnboardingSport(state.profile.sportTemplate || 'calisthenics');
+      window.selectOnboardingHarada(obHarada);
+      window.goOnboardingStep(1);
+    };
+
+    window.closeOnboarding = function() {
+      document.getElementById('onboarding-overlay').classList.add('hidden');
+    };
+
+    window.goOnboardingStep = function(n) {
+      obStep = Math.max(1, Math.min(4, n));
+      [1,2,3,4].forEach(i => {
+        document.getElementById(`ob-step-${i}`).classList.toggle('hidden', i !== obStep);
+        const pill = document.getElementById(`ob-pill-${i}`);
+        pill.className = i === obStep
+          ? 'py-1.5 px-2 rounded-xl border text-center transition btn-soft'
+          : 'py-1.5 px-2 rounded-xl border text-center transition btn-ghost opacity-70';
+      });
+      document.getElementById('ob-btn-prev').classList.toggle('invisible', obStep === 1);
+      document.getElementById('ob-btn-next').classList.toggle('hidden', obStep === 4);
+      document.getElementById('ob-btn-finish').classList.toggle('hidden', obStep !== 4);
+    };
+
+    window.stepOnboarding = function(delta) { window.goOnboardingStep(obStep + delta); };
+
+    window.selectOnboardingSport = function(key) {
+      obSport = key;
+      ['calisthenics','gym','endurance','empty'].forEach(k => {
+        const el = document.getElementById(`ob-sp-${k}`);
+        if (el) el.style.borderColor = k === key ? 'var(--accent)' : 'var(--border-sub)';
+      });
+    };
+
+    window.selectOnboardingHarada = function(key) {
+      obHarada = key;
+      ['equilibre','athletique','vierge'].forEach(k => {
+        const el = document.getElementById(`ob-ha-${k}`);
+        if (el) el.style.borderColor = k === key ? 'var(--accent)' : 'var(--border-sub)';
+      });
+    };
+
+    window.finishOnboarding = function() {
+      state.profile.name = (document.getElementById('ob-name').value || '').trim() || 'Opérateur';
+      state.profile.weight = parseFloat(document.getElementById('ob-weight').value) || 81.0;
+      state.profile.height = parseInt(document.getElementById('ob-height').value, 10) || 191;
+      state.profile.age = parseInt(document.getElementById('ob-age').value, 10) || 23;
+      state.profile.fcBase = parseInt(document.getElementById('ob-fcbase').value, 10) || 50;
+      state.profile.targetSleep = parseFloat(document.getElementById('ob-sleep').value) || 7.5;
+      state.profile.simpleMode = document.getElementById('ob-simple-mode').checked;
+      state.profile.sportTemplate = obSport;
+
+      const spTpl = SPORT_TEMPLATES[obSport] || SPORT_TEMPLATES.calisthenics;
+      state.profile.weightStep = spTpl.step;
+      Object.entries(spTpl.map).forEach(([d, p]) => state.workoutsByDay[d] = buildPresetDay(p));
+
+      state.haradaGoal = (document.getElementById('ob-harada-goal').value || '').trim().toUpperCase() || 'EXCELLENCE GLOBALE';
+      state.harada = buildHaradaTemplate(obHarada);
+      state.onboarded = true;
+
+      window.closeOnboarding();
+      renderAll();
+      showToast(`Bienvenue ${state.profile.name} ! Ton espace HARADA-BIO est prêt.`, 'ok');
+    };
+
+    // -----------------------------------------------------------------------
+    // 5. THÈMES & UI HELPERS
+    // -----------------------------------------------------------------------
+    window.setTheme = function(t) {
+      if (t !== 'night-red') state.prevTheme = t;
+      state.theme = t;
+      document.documentElement.setAttribute('data-theme', t);
+      const sel = document.getElementById('sel-theme');
+      if (sel) sel.value = t;
+      document.querySelectorAll('[data-ob-theme]').forEach(b => {
+        b.style.borderColor = b.getAttribute('data-ob-theme') === t ? 'var(--accent)' : 'var(--border-sub)';
+      });
+      saveState();
+      if (state.activeTab === 'courbes') window.renderCharts();
+      if (state.activeTab === 'harada') renderHarada();
+    };
+
+    window.toggleNightRedQuick = function() {
+      window.setTheme(state.theme === 'night-red' ? (state.prevTheme || 'cyber') : 'night-red');
+    };
+
+    function showToast(msg, tone) {
+      const box = document.getElementById('toast-box');
+      if (!box) return;
+      const el = document.createElement('div');
+      el.className = 'hud-card px-3.5 py-2.5 rounded-xl text-xs font-bold text-bright pointer-events-auto';
+      el.style.borderColor = tone === 'warn' ? 'var(--accent-warn)' : 'var(--accent)';
+      el.textContent = msg;
+      box.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 250); }, 2800);
+    }
+
+    function openConfirm(title, msg, cb) {
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-msg').textContent = msg;
+      confirmCb = cb;
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+    window.closeConfirm = function(ok) {
+      document.getElementById('confirm-modal').classList.add('hidden');
+      const fn = confirmCb; confirmCb = null;
+      if (ok && fn) fn();
+    };
+
+    // -----------------------------------------------------------------------
+    // 6. MOTEURS BIOMATHÉMATIQUES (SOMMEIL, BUSSO, HILL >= 5 MOIS, Δt)
+    // -----------------------------------------------------------------------
+    function timeToMin(s) {
+      if (!s || !s.includes(':')) return 0;
+      const [h, m] = s.split(':').map(Number);
+      return ((h||0)*60 + (m||0) + 1440) % 1440;
+    }
+    function minToTime(m) {
+      const n = ((Math.round(m)%1440)+1440)%1440;
+      return `${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
+    }
+    function fmtHM(h) {
+      const m = Math.max(0, Math.round(h*60));
+      return `${Math.floor(m/60)}h${String(m%60).padStart(2,'0')}`;
+    }
+    function getM0(key) {
+      const t = EXO_CATALOG[key];
+      if (!t || !t.beta) return 0;
+      return Number((t.beta * (Number(state.profile.weight)||81)).toFixed(1));
+    }
+
+    function computeSleep() {
+      const t = state.today, fcBase = Number(state.profile.fcBase)||50, target = Number(state.profile.targetSleep)||7.5;
+      const bedM = timeToMin(t.bedTime), wakeM = timeToMin(t.wakeTime);
+      let tib = wakeM - bedM; if (tib <= 0) tib += 1440;
+
+      const sol = t.fastSleep ? 7 : Math.round((14 + (state.profile.simpleMode ? 0 : 2.2 * Math.max(0, t.fcBed - (fcBase+8)))) * (t.rituals.sun ? 0.85 : 1));
+      const dip = state.profile.simpleMode ? 10 : (t.fcBed - t.fcWake);
+      const drift = state.profile.simpleMode ? 0 : Math.max(0, t.fcWake - fcBase);
+
+      let waso = 0, phase = 'Continu';
+      if (t.nightAwakening) {
+        let el = timeToMin(t.awakeningTime) - bedM; if (el < 0) el += 1440;
+        const rem = Math.max(0, tib - el);
+        phase = el <= 180 ? 'N3 (Début)' : (rem <= 120 ? 'REM (Fin)' : 'Milieu');
+        waso = Math.round(Math.min(Math.max(10, rem), 14 + (rem<=90?8:0) + 1.8*drift));
+      }
+
+      const tstMin = Math.max(60, tib - sol - waso) + (Number(t.napMin)||0);
+      const tstH = tstMin / 60;
+      const debt = Math.max(0, target - tstH);
+      const fcDelta = state.profile.simpleMode ? 0 : (t.fcWake - fcBase);
+      const mRecup = Math.max(1, Number((1 + 0.15*debt + 0.05*Math.max(0, fcDelta) - (t.rituals.water?0.03:0)).toFixed(2)));
+      const iRecup = Math.round(Math.max(15, Math.min(100, 95 - debt*11 - drift*4.5 - (t.nightAwakening?waso*0.25:0) + (t.rituals.paper?2:0) + (t.rituals.sun?2:0) + (t.rituals.water?2:0) + (t.napMin>0?4:0))));
+      return { tibH:tib/60, tstH, sol, waso, phase, dip, fcDelta, mRecup, tau2:Number((10*mRecup).toFixed(1)), iRecup };
+    }
+
+    function compute1RM(exo) {
+      if (exo.type !== 'rpt' || !exo.sets?.length) return null;
+      const m0 = getM0(exo.key), g = EXO_CATALOG[exo.key]?.gamma ?? 1.0;
+      let sum = 0;
+      exo.sets.forEach(s => {
+        const mEff = m0 + g * (Number(s.lest)||0);
+        const r = exo.unilateral ? Math.max(1, ((Number(s.repsD)||1)+(Number(s.repsG)||1))/2) : Math.max(1, Number(s.reps)||1);
+        sum += mEff / Math.exp(-0.026 * (r - 1));
+      });
+      return Number((sum / exo.sets.length).toFixed(1));
+    }
+
+    function computeWorkoutLoad(dayW) {
+      if (!dayW?.exercises?.length) return { totalLoad:0, scapScore:0.36, rmMap:{} };
+      const rmMap = {};
+      let load = 0, pushPull = 0, rear = 0;
+      dayW.exercises.forEach(exo => {
+        if (exo.type === 'rpt') {
+          const m0 = getM0(exo.key), g = EXO_CATALOG[exo.key]?.gamma ?? 1.0;
+          const rm = compute1RM(exo) || (m0 + 20);
+          rmMap[exo.spec] = rm;
+          let sets = exo.sets;
+          if (state.express20) sets = sets.slice(0, 2);
+          else if (state.taperMode) sets = sets.slice(0, Math.max(1, Math.ceil(sets.length*0.5)));
+          let el = 0;
+          sets.forEach(s => {
+            const mEff = m0 + g*(Number(s.lest)||0);
+            const r = exo.unilateral ? ((Number(s.repsD)||0)+(Number(s.repsG)||0))/2 : (Number(s.reps)||0);
+            el += r * 0.16 * Math.exp(4.8 * Math.min(1, mEff/Math.max(1, rm)));
+          });
+          load += el;
+          if (exo.category === 'push') pushPull += el;
+          if (exo.category === 'pull_horiz') rear += el;
+        } else if (exo.type === 'pyramid') {
+          load += (Number(exo.actualReps)||0) * 1.45 * (state.taperMode?0.5:1);
+        } else if (exo.type === 'density') {
+          load += (Number(exo.densityVal)||0) * (exo.densityMult||1) * 1.45 * (state.taperMode?0.5:1);
+        } else if (exo.type === 'prophylaxis' && exo.done) {
+          load += 18; rear += 55;
+        } else if (exo.type === 'cardio') {
+          load += (Number(dayW.duration)||30) * (Number(exo.rpe)||7) * 0.85 * (exo.impactFactor||1);
+        }
+      });
+      return { totalLoad:Math.round(load), scapScore: pushPull>10 ? Number(Math.min(0.65, (rear+15)/(pushPull+45)).toFixed(2)) : 0.36, rmMap };
+    }
+
+    // MOTEUR HARADA : COURBE DE HILL (γ = 1.5, >= 5 MOIS MIN) + DÉCROISSANCE Δt
+    const HILL_CFG = {
+      lally: { nMin:150, tol:2, label:'Lally ≥5m' },
+      phys:  { nMin:65,  tol:3, label:'Phys ≥5m' },
+      actr:  { nMin:55,  tol:7, label:'ACT-R ≥5m' }
+    };
+
+    function getHaradaMetrics(cell) {
+      const cfg = HILL_CFG[cell.engine] || HILL_CFG.lally;
+      let dt = 0;
+      if (cell.lastDone) {
+        const t1 = new Date(cell.lastDone + 'T12:00:00').getTime();
+        const t2 = new Date(state.currentDate + 'T12:00:00').getTime();
+        dt = Math.max(0, Math.round((t2 - t1)/86400000)) + (state.simDayOffset || 0);
+      }
+      const rawU = Number(cell.units) || 0;
+      let uEff = rawU;
+      let decaying = false;
+      if (rawU > 0 && dt > cfg.tol) {
+        decaying = true;
+        const over = dt - cfg.tol;
+        if (cell.engine === 'phys') uEff = rawU * Math.exp(-over / 21.5);
+        else if (cell.engine === 'actr') uEff = rawU * Math.pow(1 + 0.04 * over, -0.35);
+        else uEff = rawU * Math.exp(-over / 45.0);
+      }
+      // Hill saturation normalized at nMin (S(nMin) = 100%, slow start γ = 1.5)
+      const delta = cfg.nMin * 0.52;
+      const num = Math.pow(Math.max(0, uEff), 1.5);
+      const maxVal = Math.pow(cfg.nMin, 1.5) / (Math.pow(delta, 1.5) + Math.pow(cfg.nMin, 1.5));
+      const score = uEff <= 0 ? 0 : Math.min(100, Number(((num / (Math.pow(delta, 1.5) + num)) / maxVal * 100).toFixed(1)));
+      const inActrWindow = cell.engine === 'actr' && dt >= 2 && dt <= 7 && cell.lastDone !== state.currentDate;
+      return { cfg, dt, uEff:Number(uEff.toFixed(1)), score, decaying, inActrWindow };
+    }
+
+    // -----------------------------------------------------------------------
+    // 7. HANDLERS (NAVIGATION, PROFIL, JOUR, SPORT, HARADA, DONNÉES)
+    // -----------------------------------------------------------------------
+    window.switchTab = function(t) {
+      state.activeTab = t;
+      ['jour','courbes','prog','harada','donnees'].forEach(k => {
+        document.getElementById(`view-${k}`).classList.toggle('hidden', k !== t);
+        document.getElementById(`tab-${k}`).className = k === t
+          ? 'tab-btn-active px-3 py-1.5 rounded-xl border text-xs font-bold whitespace-nowrap flex items-center gap-1.5'
+          : 'btn-ghost px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5';
+      });
+      saveState();
+      if (t === 'courbes') setTimeout(window.renderCharts, 40);
+      if (t === 'prog') renderProgTable();
+      if (t === 'harada') renderHarada();
+      if (t === 'donnees') renderHistory();
+    };
+
+    window.toggleProfileDrawer = function() { state.profileDrawerOpen = !state.profileDrawerOpen; renderProfile(); saveState(); };
+    window.updateProfile = function(field, val) {
+      if (field === 'name') state.profile.name = (val||'').trim() || 'Opérateur';
+      else if (field === 'simpleMode') state.profile.simpleMode = !!val;
+      else { const n = parseFloat(val); if (!isNaN(n) && n > 0) state.profile[field] = n; }
+      renderAll();
+      showToast('Profil mis à jour.', 'ok');
+    };
+    window.autoCalcFcBase = function() {
+      const ok = state.history.slice(-21).filter(h => (h.iRecup||0) >= 75 && Number(h.fcWake) > 30);
+      if (!ok.length) return showToast('Pas assez de jours sains enregistrés.', 'warn');
+      state.profile.fcBase = Math.round(ok.reduce((a,b) => a + Number(b.fcWake), 0) / ok.length);
+      renderAll();
+      showToast(`FC Base 21j : ${state.profile.fcBase} bpm`, 'ok');
+    };
+
+    // Sleep handlers
+    window.changeDate = function(v) { if (!v) return; state.currentDate = v; state.currentDay = getDaySlotFromISO(v); renderAll(); };
+    window.toggleSleepEditMode = function() { state.sleepEditOpen = !state.sleepEditOpen; renderSleep(); saveState(); };
+    window.adjustTime = function(f, d) { state.today[f] = minToTime(timeToMin(state.today[f]) + d); renderAll(); };
+    window.setTimeDirect = function(f, v) { if (v?.includes(':')) { state.today[f] = v; renderAll(); } };
+    window.adjustFC = function(f, d) { state.today[f] = Math.max(30, Math.min(130, (Number(state.today[f])||50) + d)); renderAll(); };
+    window.setFCDirect = function(f, v) { const n = parseInt(v,10); if (!isNaN(n)) { state.today[f] = Math.max(30, Math.min(130, n)); renderAll(); } };
+    window.toggleFastSleep = function(c) { state.today.fastSleep = !!c; renderAll(); };
+    window.toggleAwakening = function(c) { state.today.nightAwakening = !!c; renderAll(); };
+    window.adjustAwakeningTime = function(d) { state.today.awakeningTime = minToTime(timeToMin(state.today.awakeningTime||'03:15') + d); renderAll(); };
+    window.setAwakeningTimeDirect = function(v) { if (v?.includes(':')) { state.today.awakeningTime = v; renderAll(); } };
+    window.setNap = function(m) { state.today.napMin = Number(m)||0; renderAll(); };
+    window.toggleRitual = function(k) { state.today.rituals[k] = !state.today.rituals[k]; renderAll(); };
+
+    // Sport handlers
+    window.selectDaySlot = function(d) { state.currentDay = d; renderAll(); };
+    window.applySessionPreset = function(k) { state.workoutsByDay[state.currentDay] = buildPresetDay(k); renderAll(); };
+    window.setSportTime = function(v) { if (v?.includes(':')) { state.workoutsByDay[state.currentDay].time = v; renderAll(); } };
+    window.adjustSportDuration = function(d) { const w = state.workoutsByDay[state.currentDay]; w.duration = Math.max(0, Math.min(180, (Number(w.duration)||0)+d)); renderAll(); };
+    window.setSportDuration = function(v) { const n = parseInt(v,10); if (!isNaN(n)) { state.workoutsByDay[state.currentDay].duration = Math.max(0, Math.min(180, n)); renderAll(); } };
+    window.toggleExpress20 = function() {
+      state.express20 = !state.express20;
+      if (state.express20) state.workoutsByDay[state.currentDay].duration = 20;
+      renderAll();
+      showToast(state.express20 ? '⚡ Mode Express 20\' actif (2 séries, 100% charge).' : 'Mode standard (3 séries).', 'ok');
+    };
+    window.toggleTaper = function() { state.taperMode = !state.taperMode; renderAll(); };
+    window.addSelectedExercise = function() {
+      const k = document.getElementById('sel-add-exo').value;
+      const inst = createExoInstance(k);
+      if (inst) { state.workoutsByDay[state.currentDay].exercises.push(inst); renderAll(); showToast(`Ajouté : ${inst.name}`, 'ok'); }
+    };
+    window.addCustomExercise = function() {
+      const name = (document.getElementById('inp-custom-exo-name').value || '').trim();
+      if (!name) return showToast('Entre un nom d\'exercice.', 'warn');
+      const t = document.getElementById('sel-custom-exo-type').value;
+      const inst = { uid:'C_'+Date.now(), key:t==='rpt_gym'?'BENCH':'CUSTOM', spec:'CUSTOM', name, type:(t==='cardio'||t==='prophylaxis')?t:'rpt', unilateral:t==='rpt_uni', category:t==='cardio'?'cardio':'push', note:'Exercice personnalisé', nextSetIdx:0 };
+      if (inst.type==='rpt') inst.sets = [{lest:0,reps:8,repsD:8,repsG:8,minR:6,maxR:10,target:'6-10'},{lest:0,reps:10,repsD:10,repsG:10,minR:8,maxR:12,target:'8-12'},{lest:0,reps:12,repsD:12,repsG:12,minR:10,maxR:15,target:'10-15'}];
+      if (inst.type==='cardio') { inst.rpe = 7; inst.impactFactor = 1; }
+      if (inst.type==='prophylaxis') { inst.setsCount = 3; inst.repsTarget = '12 reps'; inst.done = true; }
+      state.workoutsByDay[state.currentDay].exercises.push(inst);
+      document.getElementById('inp-custom-exo-name').value = '';
+      renderAll();
+    };
+    window.removeExercise = function(i) { state.workoutsByDay[state.currentDay].exercises.splice(i,1); renderAll(); };
+    window.resetDayToDefault = function() {
+      const p = state.workoutsByDay[state.currentDay].presetKey || 'libre';
+      state.workoutsByDay[state.currentDay] = buildPresetDay(p);
+      renderAll();
+    };
+    window.adjustSetLest = function(ei, si, d) {
+      const s = state.workoutsByDay[state.currentDay].exercises[ei].sets[si];
+      s.lest = Math.max(0, Number(((Number(s.lest)||0)+d).toFixed(1)));
+      renderAll();
+    };
+    window.setSetLestDirect = function(ei, si, v) { const n = parseFloat(v); if (!isNaN(n)) { state.workoutsByDay[state.currentDay].exercises[ei].sets[si].lest = Math.max(0, n); renderAll(); } };
+    window.adjustSetReps = function(ei, si, d) { const s = state.workoutsByDay[state.currentDay].exercises[ei].sets[si]; s.reps = Math.max(1, (Number(s.reps)||1)+d); renderAll(); };
+    window.adjustLegReps = function(ei, si, leg, d) {
+      const s = state.workoutsByDay[state.currentDay].exercises[ei].sets[si];
+      const prop = leg==='D'?'repsD':'repsG';
+      s[prop] = Math.max(1, (Number(s[prop])||1)+d);
+      s.reps = Math.round(((s.repsD||1)+(s.repsG||1))/2);
+      renderAll();
+    };
+    window.upgradeStep = function(ei) {
+      const exo = state.workoutsByDay[state.currentDay].exercises[ei];
+      const step = Number(state.profile.weightStep) || 2.4;
+      const idx = (exo.nextSetIdx || 0) % exo.sets.length;
+      const s = exo.sets[idx];
+      s.lest = Number(((Number(s.lest)||0) + step).toFixed(1));
+      s.reps = s.minR || 6;
+      if (exo.unilateral) { s.repsD = s.reps; s.repsG = s.reps; }
+      exo.nextSetIdx = (idx + 1) % exo.sets.length;
+      renderAll();
+      showToast(`+${step} kg sur S${idx+1} (${exo.name})`, 'ok');
+    };
+    window.adjustPyr = function(ei, field, d) { const e = state.workoutsByDay[state.currentDay].exercises[ei]; e[field] = Math.max(0, (Number(e[field])||0)+d); renderAll(); };
+    window.validatePyr = function(ei) { const e = state.workoutsByDay[state.currentDay].exercises[ei]; e.actualReps = e.tier*e.tier; e.tier += 1; renderAll(); showToast(`Palier validé → prochaine cible ${e.tier}`, 'ok'); };
+    window.adjustDens = function(ei, d) { const e = state.workoutsByDay[state.currentDay].exercises[ei]; e.densityVal = Math.max(1, (Number(e.densityVal)||1)+d); renderAll(); };
+    window.toggleProph = function(ei) { const e = state.workoutsByDay[state.currentDay].exercises[ei]; e.done = !e.done; renderAll(); };
+    window.setRpe = function(ei, v) { state.workoutsByDay[state.currentDay].exercises[ei].rpe = v; renderAll(); };
+    window.toggleSupp = function(k) { state.today.supps[k] = !state.today.supps[k]; renderSupps(); saveState(); };
+    window.setSuppNote = function(v) { state.today.supps.note = v||''; saveState(); };
+
+    // Persist Day / Workout
+    function persistRecord(lockSleep, msg) {
+      const sl = computeSleep(), curW = state.workoutsByDay[state.currentDay], ws = computeWorkoutLoad(curW);
+      const last = state.history[state.history.length-1];
+      const mergedRm = Object.assign({}, last?.rm || {}, ws.rmMap);
+      const prevM = last ? last.muscleAdapt : 100, prevT = last ? last.tendonAdapt : 100;
+      const lr = ws.totalLoad / 320;
+      const newM = Number((prevM*Math.exp(-1/21.5) + (prevM+4.5*lr)*(1-Math.exp(-1/21.5))).toFixed(1));
+      const newT = Number((prevT*Math.exp(-1/65.0) + (prevT+4.5*lr)*(1-Math.exp(-1/65.0))).toFixed(1));
+      const entry = {
+        date: state.currentDate, label: state.currentDate.slice(5),
+        bedTime: state.today.bedTime, wakeTime: state.today.wakeTime,
+        fcBed: state.today.fcBed, fcWake: state.today.fcWake,
+        tst: fmtHM(sl.tstH), iRecup: sl.iRecup,
+        sessionName: (SESSION_PRESETS[curW.presetKey]?.label || 'Séance') + (state.express20?' ⚡':''),
+        duration: curW.duration, load: ws.totalLoad, rm: mergedRm,
+        muscleAdapt: newM, tendonAdapt: newT,
+        idmt: Number((newM/Math.max(1,newT)).toFixed(2)),
+        k2_k1: Number(Math.max(0.35, Math.min(1.45, (last?last.k2_k1:0.7)*Math.exp(-1/sl.tau2) + 0.14*lr*sl.mRecup)).toFixed(2)),
+        scap: ws.scapScore
+      };
+      const i = state.history.findIndex(h => h.date === state.currentDate);
+      if (i >= 0) state.history[i] = entry; else { state.history.push(entry); state.history.sort((a,b)=>a.date.localeCompare(b.date)); }
+      if (lockSleep) state.sleepEditOpen = false;
+      renderAll();
+      showToast(msg || `Journée du ${state.currentDate} enregistrée.`, 'ok');
+    }
+    window.saveFullDay = function() { persistRecord(true); };
+    window.saveWorkoutOnly = function() { persistRecord(false, 'Séance enregistrée dans le journal.'); };
+    window.loadHistoryDay = function(idx) {
+      const h = state.history[idx]; if (!h) return;
+      state.currentDate = h.date; state.currentDay = getDaySlotFromISO(h.date);
+      state.today.bedTime = h.bedTime; state.today.wakeTime = h.wakeTime;
+      state.today.fcBed = h.fcBed; state.today.fcWake = h.fcWake;
+      state.sleepEditOpen = true; window.switchTab('jour'); renderAll();
+    };
+    window.deleteHistory = function(idx) {
+      openConfirm('Supprimer cette journée ?', 'Cette entrée sera retirée de l\'historique.', () => { state.history.splice(idx,1); renderAll(); });
+    };
+    window.purgeHistory = function() {
+      openConfirm('Purger tout l\'historique ?', 'Ton profil et ta grille Harada seront conservés.', () => { state.history = []; renderAll(); showToast('Historique purgé.', 'ok'); });
+    };
+
+    window.simulateWeek = function(mode) {
+      const last = state.history[state.history.length-1] || { date:state.currentDate, rm:{HSPU:85,CTB:100,BENCH:80}, muscleAdapt:100, tendonAdapt:100, k2_k1:0.7 };
+      const d = new Date(last.date+'T12:00:00'); d.setDate(d.getDate()+7);
+      const iso = d.toISOString().slice(0,10);
+      const rmNext = {}; Object.keys(last.rm).forEach(k => rmNext[k] = Number((last.rm[k]*(mode==='sleep_debt'?0.99:1.02)).toFixed(1)));
+      const nm = Number((last.muscleAdapt + (mode==='taper'?1.0:3.0)).toFixed(1));
+      const nt = Number((last.tendonAdapt + (mode==='sleep_debt'?0.4:1.4)).toFixed(1));
+      state.history.push({ date:iso, label:iso.slice(5), bedTime:'23:00', wakeTime:'06:30', fcBed:62, fcWake:mode==='sleep_debt'?state.profile.fcBase+6:state.profile.fcBase, tst:mode==='sleep_debt'?'5h00':'7h20', iRecup:mode==='sleep_debt'?56:94, sessionName:'Simu '+mode, duration:40, load:mode==='taper'?150:320, rm:rmNext, muscleAdapt:nm, tendonAdapt:nt, idmt:Number((nm/nt).toFixed(2)), k2_k1:mode==='sleep_debt'?1.15:0.72, scap:0.36 });
+      renderAll();
+    };
+
+    // Harada Handlers
+    window.updateHaradaGoal = function(v) { state.haradaGoal = (v||'').trim().toUpperCase() || 'OBJECTIF'; saveState(); renderHarada(); };
+    window.setHaradaView = function(v) { state.haradaView = v; renderHarada(); saveState(); };
+    window.selectHaradaCell = function(p, c) { state.selectedHaradaCell = {pIdx:p, cIdx:c}; renderHarada(); saveState(); };
+    window.validateHaradaCell = function(p, c) {
+      const cell = state.harada[p]?.cells[c]; if (!cell) return;
+      const met = getHaradaMetrics(cell);
+      const bonus = met.inActrWindow ? 1.25 : 1.0;
+      cell.units = Number((met.uEff + bonus).toFixed(2));
+      cell.reps = (cell.reps||0) + 1;
+      cell.lastDone = state.currentDate;
+      renderHarada(); saveState();
+      showToast(`✓ ${cell.name} (+${bonus}u)`, 'ok');
+    };
+    window.cycleHaradaEngine = function(p, c) {
+      const cell = state.harada[p]?.cells[c]; if (!cell) return;
+      const ord = ['lally','actr','phys'];
+      cell.engine = ord[(ord.indexOf(cell.engine||'lally')+1)%3];
+      renderHarada(); saveState();
+    };
+    window.renameHaradaCell = function(p, c, v) { if ((v||'').trim()) { state.harada[p].cells[c].name = v.trim(); saveState(); renderHarada(); } };
+    window.renameHaradaPillar = function(p, v) { if ((v||'').trim()) { state.harada[p].name = v.trim().toUpperCase(); saveState(); renderHarada(); } };
+    window.toggleSubAction = function(p, c, s) {
+      const cell = state.harada[p].cells[c], sa = cell.subActions[s];
+      const done = sa.lastDone === state.currentDate;
+      const met = getHaradaMetrics(cell);
+      if (!done) {
+        sa.lastDone = state.currentDate; sa.count = (sa.count||0) + 1;
+        cell.units = Number((met.uEff + 0.5).toFixed(2));
+        cell.lastDone = state.currentDate;
+      } else {
+        sa.lastDone = null; sa.count = Math.max(0, (sa.count||1)-1);
+        cell.units = Math.max(0, Number((cell.units - 0.5).toFixed(2)));
+      }
+      renderHarada(); saveState();
+    };
+    window.renameSubAction = function(p, c, s, v) { if ((v||'').trim()) { state.harada[p].cells[c].subActions[s].text = v.trim(); saveState(); } };
+    window.addSubAction = function(p, c) {
+      const inp = document.getElementById('inp-new-sub');
+      const v = (inp?.value||'').trim(); if (!v) return;
+      state.harada[p].cells[c].subActions.push({ id:'s'+Date.now(), text:v, count:0, lastDone:null });
+      inp.value = ''; renderHarada(); saveState();
+    };
+    window.deleteSubAction = function(p, c, s) { state.harada[p].cells[c].subActions.splice(s,1); renderHarada(); saveState(); };
+    window.simulateHaradaOffset = function(d) { state.simDayOffset = (state.simDayOffset||0) + d; renderHarada(); };
+    window.resetHaradaOffset = function() { state.simDayOffset = 0; renderHarada(); };
+
+    window.snapshotHaradaMonth = function() {
+      const scores = state.harada.map(p => Number((p.cells.reduce((a,c)=>a+getHaradaMetrics(c).score,0)/8).toFixed(1)));
+      const label = state.currentDate.slice(0,7) + ' (' + new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) + ')';
+      state.haradaArchives.push({ label, scores });
+      saveState(); renderHarada();
+      showToast(`📸 Archive figée : ${label}`, 'ok');
+    };
+    window.deleteSelectedArchive = function() {
+      const sel = document.getElementById('sel-harada-archive');
+      const idx = parseInt(sel.value, 10);
+      if (!isNaN(idx)) { state.haradaArchives.splice(idx,1); saveState(); renderHarada(); }
+    };
+    window.copyAiHaradaPrompt = function() {
+      const prompt = `Génère une grille Harada au format JSON strict pour mon objectif central : "[MON OBJECTIF]". Réponds UNIQUEMENT avec un bloc JSON de cette forme : {"haradaGoal":"MON OBJECTIF","pillars":[{"name":"PILIER 1","actions":["Action 1","Action 2","Action 3","Action 4","Action 5","Action 6","Action 7","Action 8"]}]} avec exactement 8 piliers et 8 actions concrètes par pilier.`;
+      navigator.clipboard?.writeText(prompt);
+      showToast('Prompt IA copié ! Colle-le dans une IA puis importe le JSON dans Données.', 'ok');
+    };
+
+    // JSON Export / Import
+    window.downloadJSON = function() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = `harada_bio_${state.profile.name.toLowerCase().replace(/\s+/g,'_')}_${state.currentDate}.json`;
+      a.click(); URL.revokeObjectURL(a.href);
+      showToast('Sauvegarde .json téléchargée.', 'ok');
+    };
+    function applyImportedData(parsed, closeOb) {
+      if (parsed.pillars && Array.isArray(parsed.pillars) && parsed.pillars.length === 8) {
+        const pal = ['#10b981','#22d3ee','#f59e0b','#818cf8','#f43f5e','#fb923c','#a855f7','#38bdf8'];
+        const ic = ['fa-heart-pulse','fa-shield-halved','fa-compass','fa-crosshairs','fa-hands-praying','fa-bolt','fa-scale-balanced','fa-eye'];
+        state.haradaGoal = (parsed.haradaGoal || state.haradaGoal).toUpperCase();
+        state.harada = parsed.pillars.map((p,i) => ({ id:i, name:(p.name||`PILIER ${i+1}`).toUpperCase(), color:pal[i], icon:ic[i], cells:(p.actions||[]).slice(0,8).map((a,j)=>makeHaradaCell(j, a, 'lally')) }));
+        renderAll();
+        return showToast('Grille Harada IA importée !', 'ok');
+      }
+      if (parsed.profile && parsed.workoutsByDay) {
+        state = Object.assign(buildDefaultState(), parsed);
+        state.onboarded = true;
+        if (closeOb) window.closeOnboarding();
+        window.setTheme(state.theme || 'cyber');
+        renderAll();
+        return showToast('Profil complet restauré !', 'ok');
+      }
+      showToast('Format JSON non reconnu.', 'warn');
+    }
+    window.importJSONFile = function(ev, closeOb) {
+      const f = ev.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = e => { try { applyImportedData(JSON.parse(e.target.result), closeOb); } catch(err) { showToast('JSON invalide.', 'warn'); } };
+      r.readAsText(f);
+    };
+    window.importJSONText = function() {
+      try { applyImportedData(JSON.parse(document.getElementById('json-io-box').value), false); } catch(e) { showToast('JSON invalide.', 'warn'); }
+    };
+    window.requestResetAll = function() {
+      openConfirm('Tout réinitialiser ?', 'L\'application repartira sur la page d\'accueil vierge.', () => {
+        localStorage.removeItem(STORAGE_KEY);
+        state = buildDefaultState();
+        window.setTheme('cyber');
+        renderAll();
+        window.openOnboarding();
+      });
+    };
+
+    // A5 Print Modal
+    window.openA5Modal = function() {
+      document.getElementById('a5-user').textContent = state.profile.name;
+      document.getElementById('a5-weight').textContent = Number(state.profile.weight).toFixed(1);
+      document.getElementById('a5-goal').textContent = state.haradaGoal;
+      const days = [['Lun','lundi'],['Mar','mardi'],['Mer','mercredi'],['Jeu','jeudi'],['Ven','vendredi']];
+      document.getElementById('a5-workouts-body').innerHTML = days.map(([lbl, k]) => {
+        const w = state.workoutsByDay[k];
+        const pName = SESSION_PRESETS[w.presetKey]?.label || w.presetKey;
+        const exos = (w.exercises||[]).map(e => e.type==='rpt' ? `${e.name} (${e.sets.map(s=>'+'+s.lest).join('/')})` : e.name).join(' • ') || 'Repos';
+        return `<tr><td class="border border-black p-1 font-bold">${lbl} (${pName})</td><td class="border border-black p-1">${exos}</td><td class="border border-black p-1 text-center">[ ]</td></tr>`;
+      }).join('');
+      document.getElementById('modal-a5').classList.remove('hidden');
+    };
+    window.closeA5Modal = function() { document.getElementById('modal-a5').classList.add('hidden'); };
+
+    // -----------------------------------------------------------------------
+    // 8. RENDER PIPELINE
+    // -----------------------------------------------------------------------
+    function renderProfile() {
+      const p = state.profile;
+      document.getElementById('hdr-profile-summary').textContent = `${p.name} • ${Number(p.weight).toFixed(1)} kg • ${p.simpleMode?'Sans FC':'FC '+p.fcBase}`;
+      document.getElementById('prof-name').value = p.name;
+      document.getElementById('prof-weight').value = p.weight;
+      document.getElementById('prof-height').value = p.height;
+      document.getElementById('prof-age').value = p.age;
+      document.getElementById('prof-fcbase').value = p.fcBase;
+      document.getElementById('prof-step').value = p.weightStep;
+      document.getElementById('prof-simple').checked = !!p.simpleMode;
+      document.getElementById('profile-drawer').classList.toggle('hidden', !state.profileDrawerOpen);
+    }
+
+    function renderDiagnostic() {
+      const sl = computeSleep(), ws = computeWorkoutLoad(state.workoutsByDay[state.currentDay]);
+      const last = state.history[state.history.length-1];
+      document.getElementById('kpi-irecup').textContent = `${sl.iRecup}%`;
+      document.getElementById('kpi-tst').textContent = fmtHM(sl.tstH);
+      document.getElementById('kpi-load').textContent = `${ws.totalLoad} u.a.`;
+      document.getElementById('diag-subtag').textContent = `τ₂ eff: ${sl.tau2}j • Dipping: ${sl.dip>=0?'-'+sl.dip:'+'+Math.abs(sl.dip)} bpm`;
+      document.getElementById('diag-badge').textContent = sl.iRecup < 65 ? 'Alerte Fatigue' : (sl.iRecup < 82 ? 'Vigilance' : 'Feu Vert • Prêt');
+      document.getElementById('diag-message').textContent = sl.iRecup < 65 ? 'Dette de récupération : active Express 20\' ou Affûtage.' : 'Récupération solide. Feu vert pour la séance du jour.';
+
+      document.getElementById('gauge-k2k1').textContent = (last?.k2_k1 ?? 0.72).toFixed(2);
+      document.getElementById('gauge-idmt').textContent = (last?.idmt ?? 1.03).toFixed(2);
+      document.getElementById('gauge-scap').textContent = ws.scapScore.toFixed(2);
+      document.getElementById('gauge-tau2').textContent = `${sl.tau2} j`;
+    }
+
+    function renderSleep() {
+      const t = state.today, sl = computeSleep(), simple = !!state.profile.simpleMode;
+      document.getElementById('inp-date').value = state.currentDate;
+      document.getElementById('inp-bed-time').value = t.bedTime;
+      document.getElementById('inp-wake-time').value = t.wakeTime;
+      document.getElementById('inp-fc-bed').value = t.fcBed;
+      document.getElementById('inp-fc-wake').value = t.fcWake;
+      document.getElementById('lbl-sol').textContent = `${sl.sol}m`;
+      document.getElementById('lbl-tib').textContent = fmtHM(sl.tibH);
+      document.getElementById('lbl-fcbase-inline').textContent = state.profile.fcBase;
+      document.getElementById('lbl-fcdelta-inline').textContent = `${sl.fcDelta>0?'+':''}${sl.fcDelta} bpm`;
+      ['row-fc-bed','row-fc-wake','row-fc-delta'].forEach(id => document.getElementById(id).classList.toggle('hidden', simple));
+
+      document.getElementById('chk-fast-sleep').checked = !!t.fastSleep;
+      document.getElementById('lbl-fast-sleep-tag').textContent = t.fastSleep ? 'SOL = 7m' : 'Auto';
+      document.getElementById('chk-awakening').checked = !!t.nightAwakening;
+      document.getElementById('waso-adjust-bar').classList.toggle('hidden', !t.nightAwakening);
+      document.getElementById('lbl-waso-badge').textContent = t.nightAwakening ? `${t.awakeningTime} (-${sl.waso}m)` : 'Continu (0m)';
+      document.getElementById('inp-awakening-time').value = t.awakeningTime;
+      document.getElementById('lbl-awakening-phase').textContent = sl.phase;
+
+      document.getElementById('sleep-edit-body').classList.toggle('hidden', !state.sleepEditOpen);
+      document.getElementById('sleep-locked-summary').classList.toggle('hidden', state.sleepEditOpen);
+      document.getElementById('lbl-edit-day').textContent = state.sleepEditOpen ? 'Réduire' : 'Modifier';
+      document.getElementById('sum-bed').textContent = simple ? t.bedTime : `${t.bedTime} • ${t.fcBed}`;
+      document.getElementById('sum-wake').textContent = simple ? t.wakeTime : `${t.wakeTime} • ${t.fcWake}`;
+      document.getElementById('sum-tst').textContent = fmtHM(sl.tstH);
+      document.getElementById('sum-nap-waso').textContent = `${t.napMin}m • ${t.nightAwakening?t.awakeningTime:'Continu'}`;
+      document.getElementById('sum-rituals').textContent = `${t.rituals.paper?'📵':'·'} ${t.rituals.sun?'☀️':'·'} ${t.rituals.water?'💧':'·'}`;
+
+      [0,20,30,90].forEach(n => {
+        document.getElementById(`btn-nap-${n}`).className = Number(t.napMin)===n ? 'px-2 py-1 rounded-lg btn-accent' : 'px-2 py-1 rounded-lg btn-ghost font-bold';
+      });
+      ['paper','sun','water'].forEach(r => {
+        document.getElementById(`btn-rit-${r}`).className = t.rituals[r]
+          ? 'flex-1 py-1 rounded-lg text-[11px] font-bold btn-soft'
+          : 'flex-1 py-1 rounded-lg text-[11px] font-semibold btn-ghost opacity-60';
+      });
+    }
+
+    function renderSport() {
+      const cur = state.workoutsByDay[state.currentDay], step = Number(state.profile.weightStep)||2.4;
+      ['lundi','mardi','mercredi','jeudi','vendredi','repos'].forEach(d => {
+        document.getElementById(`day-btn-${d}`).className = d === state.currentDay
+          ? 'py-1.5 px-2 rounded-xl text-xs font-extrabold border btn-soft'
+          : 'py-1.5 px-2 rounded-xl text-xs font-semibold btn-ghost';
+      });
+
+      const pSel = document.getElementById('sel-session-preset');
+      if (!pSel.options.length) {
+        pSel.innerHTML = Object.entries(SESSION_PRESETS).map(([k,v]) => `<option value="${k}">${v.label}</option>`).join('');
+      }
+      pSel.value = cur.presetKey || 'libre';
+      document.getElementById('inp-sport-time').value = cur.time || '18:00';
+      document.getElementById('inp-sport-duration').value = cur.duration ?? 40;
+
+      document.getElementById('btn-express20').className = state.express20 ? 'btn-accent px-2.5 py-1.5 rounded-xl text-[11px] flex items-center gap-1' : 'btn-ghost px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1';
+      document.getElementById('btn-taper').className = state.taperMode ? 'btn-accent px-2.5 py-1.5 rounded-xl text-[11px] flex items-center gap-1' : 'btn-ghost px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1';
+
+      const addSel = document.getElementById('sel-add-exo');
+      if (!addSel.options.length) {
+        addSel.innerHTML = Object.entries(EXO_CATALOG).map(([k,v]) => `<option value="${k}">${v.name}</option>`).join('');
+      }
+
+      const list = document.getElementById('exercises-list');
+      if (!cur.exercises?.length) {
+        list.innerHTML = `<div class="hud-sub rounded-xl p-5 text-center text-xs text-muted">Aucun exercice sur ce créneau. Ajoute un exercice ci-dessous ou profite de ton repos.</div>`;
+        return;
+      }
+
+      list.innerHTML = cur.exercises.map((exo, idx) => {
+        if (exo.type === 'rpt') {
+          const rm = compute1RM(exo), m0 = getM0(exo.key);
+          const visibleSets = state.express20 ? exo.sets.slice(0,2) : exo.sets;
+          return `
+          <div class="hud-sub rounded-xl p-3.5 space-y-2.5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-xs sm:text-sm font-bold text-bright">${exo.name}</span>
+                  <span class="text-[10px] mono-num px-1.5 py-0.5 rounded btn-soft">1-RM: ${rm} kg</span>
+                  ${m0>0?`<span class="text-[10px] mono-num text-muted">M₀: ${m0} kg</span>`:`<span class="text-[10px] mono-num text-muted">Fonte</span>`}
+                </div>
+                <div class="text-[11px] text-muted">${exo.note||''}</div>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="window.upgradeStep(${idx})" class="btn-soft px-2.5 py-1 rounded-lg text-[11px] mono-num">+${step}kg S${((exo.nextSetIdx||0)%exo.sets.length)+1}</button>
+                <button type="button" onclick="window.removeExercise(${idx})" class="btn-ghost w-7 h-7 rounded-lg text-xs text-rose-400">✕</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-${visibleSets.length} gap-2">
+              ${visibleSets.map((s, si) => `
+              <div class="hud-card rounded-xl p-2.5 space-y-2">
+                <div class="flex justify-between text-[11px] mono-num font-bold"><span class="text-accent">S${si+1} • ${s.target}</span></div>
+                <div class="flex items-center justify-between gap-1">
+                  <span class="text-[10px] text-muted">Charge</span>
+                  <div class="flex items-center gap-1">
+                    <button type="button" onclick="window.adjustSetLest(${idx},${si},-${step})" class="btn-ghost px-1.5 py-0.5 rounded text-[10px] mono-num">-${step}</button>
+                    <input type="number" step="0.1" value="${s.lest}" onchange="window.setSetLestDirect(${idx},${si},this.value)" class="hud-input w-12 text-center py-0.5 rounded text-xs mono-num font-bold">
+                    <button type="button" onclick="window.adjustSetLest(${idx},${si},${step})" class="btn-ghost px-1.5 py-0.5 rounded text-[10px] mono-num">+${step}</button>
+                  </div>
+                </div>
+                ${exo.unilateral ? `
+                <div class="grid grid-cols-2 gap-1.5">
+                  <div class="flex items-center justify-between hud-sub rounded-lg px-1.5 py-0.5">
+                    <span class="text-[10px] font-bold text-accent">D</span>
+                    <button type="button" onclick="window.adjustLegReps(${idx},${si},'D',-1)" class="px-1 font-bold">-</button>
+                    <span class="mono-num text-xs font-bold text-bright">${s.repsD??s.reps}</span>
+                    <button type="button" onclick="window.adjustLegReps(${idx},${si},'D',1)" class="px-1 font-bold">+</button>
+                  </div>
+                  <div class="flex items-center justify-between hud-sub rounded-lg px-1.5 py-0.5">
+                    <span class="text-[10px] font-bold text-accent2">G</span>
+                    <button type="button" onclick="window.adjustLegReps(${idx},${si},'G',-1)" class="px-1 font-bold">-</button>
+                    <span class="mono-num text-xs font-bold text-bright">${s.repsG??s.reps}</span>
+                    <button type="button" onclick="window.adjustLegReps(${idx},${si},'G',1)" class="px-1 font-bold">+</button>
+                  </div>
+                </div>` : `
+                <div class="flex items-center justify-between gap-1">
+                  <span class="text-[10px] text-muted">Reps</span>
+                  <div class="flex items-center gap-1">
+                    <button type="button" onclick="window.adjustSetReps(${idx},${si},-1)" class="btn-ghost w-6 py-0.5 rounded text-xs font-bold">-</button>
+                    <span class="w-8 text-center mono-num text-xs font-bold text-bright">${s.reps}</span>
+                    <button type="button" onclick="window.adjustSetReps(${idx},${si},1)" class="btn-ghost w-6 py-0.5 rounded text-xs font-bold">+</button>
+                  </div>
+                </div>`}
+              </div>`).join('')}
+            </div>
+          </div>`;
+        }
+        if (exo.type === 'pyramid') {
+          return `
+          <div class="hud-sub rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <div><div class="text-xs sm:text-sm font-bold text-bright">${exo.name}</div><div class="text-[11px] text-muted">Palier ${exo.tier} (Cible ${exo.tier*exo.tier} reps) • Fait : ${exo.actualReps} reps</div></div>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="window.adjustPyr(${idx},'actualReps',-5)" class="btn-ghost px-2 py-1 rounded-lg text-xs">-5</button>
+              <button type="button" onclick="window.adjustPyr(${idx},'actualReps',5)" class="btn-ghost px-2 py-1 rounded-lg text-xs">+5</button>
+              <button type="button" onclick="window.validatePyr(${idx})" class="btn-soft px-2.5 py-1 rounded-lg text-xs">✓ Palier ${exo.tier}→${exo.tier+1}</button>
+              <button type="button" onclick="window.removeExercise(${idx})" class="btn-ghost w-7 h-7 rounded-lg text-xs text-rose-400">✕</button>
+            </div>
+          </div>`;
+        }
+        if (exo.type === 'density') {
+          return `
+          <div class="hud-sub rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-2">
+            <div><div class="text-xs sm:text-sm font-bold text-bright">${exo.name}</div><div class="text-[11px] text-muted">${exo.densityLabel} • Total ${exo.densityVal*exo.densityMult} reps</div></div>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="window.adjustDens(${idx},-1)" class="btn-ghost w-7 h-7 rounded-lg font-bold">-</button>
+              <span class="mono-num text-xs font-bold text-accent w-6 text-center">${exo.densityVal}</span>
+              <button type="button" onclick="window.adjustDens(${idx},1)" class="btn-ghost w-7 h-7 rounded-lg font-bold">+</button>
+              <button type="button" onclick="window.removeExercise(${idx})" class="btn-ghost w-7 h-7 rounded-lg text-xs text-rose-400">✕</button>
+            </div>
+          </div>`;
+        }
+        if (exo.type === 'prophylaxis') {
+          return `
+          <div class="hud-sub rounded-xl p-3 flex items-center justify-between gap-2">
+            <button type="button" onclick="window.toggleProph(${idx})" class="flex items-center gap-2 text-left">
+              <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs ${exo.done?'btn-accent':'btn-ghost'}">✓</span>
+              <span class="text-xs font-bold text-bright">${exo.name} <span class="text-muted font-normal">(${exo.setsCount}×${exo.repsTarget})</span></span>
+            </button>
+            <button type="button" onclick="window.removeExercise(${idx})" class="btn-ghost w-7 h-7 rounded-lg text-xs text-rose-400">✕</button>
+          </div>`;
+        }
+        if (exo.type === 'cardio') {
+          return `
+          <div class="hud-sub rounded-xl p-3.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <div><div class="text-xs sm:text-sm font-bold text-bright">${exo.name}</div><div class="text-[11px] text-muted">${exo.note||''}</div></div>
+              <button type="button" onclick="window.removeExercise(${idx})" class="btn-ghost w-7 h-7 rounded-lg text-xs text-rose-400">✕</button>
+            </div>
+            <div class="flex items-center gap-1 flex-wrap">
+              <span class="text-[11px] text-muted mr-1">RPE Borg :</span>
+              ${[1,2,3,4,5,6,7,8,9,10].map(v => `<button type="button" onclick="window.setRpe(${idx},${v})" class="w-7 h-7 rounded-lg text-xs mono-num font-bold ${exo.rpe===v?'btn-accent':'btn-ghost'}">${v}</button>`).join('')}
+            </div>
+          </div>`;
+        }
+        return '';
+      }).join('');
+    }
+
+    function renderSupps() {
+      ['rhodiola','creatine','magnesium'].forEach(k => {
+        document.getElementById(`supp-${k}`).className = state.today.supps[k]
+          ? 'px-3 py-1.5 rounded-xl border text-xs font-bold btn-soft'
+          : 'px-3 py-1.5 rounded-xl border text-xs font-semibold btn-ghost opacity-70';
+      });
+      document.getElementById('inp-supp-note').value = state.today.supps.note || '';
+    }
+
+    function renderProgTable() {
+      document.getElementById('prog-weight-lbl').textContent = `${Number(state.profile.weight).toFixed(1)} kg`;
+      document.getElementById('prog-step-lbl').textContent = `+${state.profile.weightStep} kg`;
+      document.getElementById('biomech-table-body').innerHTML = Object.entries(EXO_CATALOG).filter(([,e])=>e.type==='rpt').map(([k,e]) => `
+        <tr>
+          <td class="py-2 pr-3 font-sans font-bold text-bright">${e.name}</td>
+          <td class="py-2 px-2 text-muted">${e.beta>0?'Poids corps':'Fonte'}</td>
+          <td class="py-2 px-2 text-accent font-bold">${getM0(k)} kg</td>
+          <td class="py-2 pl-2 font-sans text-muted">${e.note}</td>
+        </tr>`).join('');
+    }
+
+    function renderHarada() {
+      document.getElementById('inp-harada-goal').value = state.haradaGoal;
+      document.getElementById('lbl-sim-offset').textContent = state.simDayOffset || 0;
+
+      let prod = 1;
+      const pScores = state.harada.map(p => {
+        const avg = p.cells.reduce((a,c) => a + getHaradaMetrics(c).score, 0) / 8;
+        prod *= Math.max(0, avg);
+        return Number(avg.toFixed(1));
+      });
+      const geom = Math.pow(prod, 1/8);
+      document.getElementById('harada-central-score').textContent = `${geom.toFixed(1)}%`;
+
+      const isMat = state.haradaView === 'matrix';
+      document.getElementById('harada-view-matrix').classList.toggle('hidden', !isMat);
+      document.getElementById('harada-view-focus').classList.toggle('hidden', isMat);
+      document.getElementById('btn-hview-matrix').className = isMat ? 'px-3 py-1 rounded-lg text-xs font-bold btn-soft' : 'px-3 py-1 rounded-lg text-xs font-semibold text-muted';
+      document.getElementById('btn-hview-focus').className = !isMat ? 'px-3 py-1 rounded-lg text-xs font-bold btn-soft' : 'px-3 py-1 rounded-lg text-xs font-semibold text-muted';
+
+      if (isMat) {
+        const macro = [0,1,2,3,-1,4,5,6,7], slots = [0,1,2,3,-1,4,5,6,7];
+        const sel = state.selectedHaradaCell || {pIdx:0,cIdx:0};
+        document.getElementById('harada-mandala-container').innerHTML = macro.map(b => {
+          if (b === -1) {
+            return `<div class="harada-subgrid" style="border-color:var(--accent)">` + slots.map(ps => {
+              if (ps === -1) return `<div class="harada-tile justify-center" style="background:var(--accent-bg);border:1px solid var(--accent)"><span class="text-[8.5px] font-black text-bright uppercase">${state.haradaGoal}</span><span class="text-xs mono-num font-black text-accent">${geom.toFixed(0)}%</span></div>`;
+              const p = state.harada[ps];
+              return `<button type="button" onclick="window.selectHaradaCell(${ps},0)" class="harada-tile justify-center" style="border:1px solid ${p.color}66;background:${p.color}20"><span class="text-[8px] font-black text-bright uppercase line-clamp-2">${p.name}</span><span class="text-[10px] mono-num font-extrabold" style="color:${p.color}">${pScores[ps].toFixed(0)}%</span></button>`;
+            }).join('') + `</div>`;
+          }
+          const p = state.harada[b];
+          return `<div class="harada-subgrid">` + slots.map(cs => {
+            if (cs === -1) return `<button type="button" onclick="window.selectHaradaCell(${b},0)" class="harada-tile justify-center" style="border:1px solid ${p.color}66;background:${p.color}25"><span class="text-[8px] font-black text-bright uppercase">${p.name}</span><span class="text-[10px] mono-num font-extrabold" style="color:${p.color}">${pScores[b].toFixed(0)}%</span></button>`;
+            const c = p.cells[cs], m = getHaradaMetrics(c), isS = sel.pIdx===b && sel.cIdx===cs;
+            return `<button type="button" onclick="window.selectHaradaCell(${b},${cs})" class="harada-tile ${isS?'is-selected':''}" style="border:1px solid ${m.decaying?'var(--accent-warn)':'var(--border-sub)'};background:var(--bg-card)">
+              <div style="position:absolute;inset:auto 0 0 0;height:${m.score}%;background:${p.color};opacity:0.22;pointer-events:none"></div>
+              <div class="relative z-10 w-full flex justify-between text-[8.5px] mono-num"><span style="color:${m.decaying?'var(--accent-warn)':'var(--text-muted)'}">${m.decaying?'↓':''}</span><span class="font-bold text-bright">${Math.round(m.score)}%</span></div>
+              <span class="relative z-10 text-[8.5px] font-semibold text-bright leading-tight line-clamp-2 my-auto">${c.name}</span>
+            </button>`;
+          }).join('') + `</div>`;
+        }).join('');
+
+        const pSel = state.harada[sel.pIdx], cSel = pSel.cells[sel.cIdx], mSel = getHaradaMetrics(cSel);
+        document.getElementById('harada-cell-inspector').innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex-1 min-w-[220px] space-y-1.5">
+              <div class="flex flex-wrap items-center gap-2 text-[10px] mono-num">
+                <span class="px-2 py-0.5 rounded font-bold" style="background:${pSel.color}25;color:${pSel.color}">${pSel.name}</span>
+                <button type="button" onclick="window.cycleHaradaEngine(${sel.pIdx},${sel.cIdx})" class="btn-ghost px-2 py-0.5 rounded font-bold">${mSel.cfg.label} ↻</button>
+                <span class="text-muted">Stock: ${mSel.uEff}/${mSel.cfg.nMin}u • Δt: ${mSel.dt}j ${mSel.decaying?'(Érosion)':''}</span>
+              </div>
+              <input type="text" value="${cSel.name.replace(/"/g,'&quot;')}" onchange="window.renameHaradaCell(${sel.pIdx},${sel.cIdx},this.value)" class="hud-input w-full px-2.5 py-1.5 rounded-lg text-xs font-bold">
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-lg mono-num font-extrabold text-accent">${mSel.score}%</span>
+              <button type="button" onclick="window.validateHaradaCell(${sel.pIdx},${sel.cIdx})" class="btn-accent px-3.5 py-2 rounded-xl text-xs">✓ Valider (+1u)</button>
+            </div>
+          </div>
+          <div class="pt-2 border-t space-y-1.5" style="border-color:var(--border-sub)">
+            <div class="text-[11px] font-bold text-accent">Sous-dossier d'actions mesurables</div>
+            ${cSel.subActions.map((sa, si) => {
+              const done = sa.lastDone === state.currentDate;
+              return `<div class="flex items-center gap-2 hud-card px-2 py-1.5 rounded-xl">
+                <button type="button" onclick="window.toggleSubAction(${sel.pIdx},${sel.cIdx},${si})" class="w-5 h-5 rounded flex items-center justify-center text-[10px] ${done?'btn-accent':'btn-ghost'}">✓</button>
+                <input type="text" value="${sa.text.replace(/"/g,'&quot;')}" onchange="window.renameSubAction(${sel.pIdx},${sel.cIdx},${si},this.value)" class="flex-1 bg-transparent text-xs text-bright outline-none">
+                <span class="mono-num text-[10px] text-muted">×${sa.count||0}</span>
+                <button type="button" onclick="window.deleteSubAction(${sel.pIdx},${sel.cIdx},${si})" class="text-rose-400 text-xs px-1">✕</button>
+              </div>`;
+            }).join('')}
+            <div class="flex gap-1.5 pt-1">
+              <input type="text" id="inp-new-sub" placeholder="+ Ajouter une sous-action mesurable..." class="hud-input flex-1 px-2.5 py-1.5 rounded-lg text-xs">
+              <button type="button" onclick="window.addSubAction(${sel.pIdx},${sel.cIdx})" class="btn-soft px-3 py-1.5 rounded-lg text-xs">+ Ajouter</button>
+            </div>
+          </div>`;
+      } else {
+        const aSel = document.getElementById('sel-harada-archive');
+        const curIdx = aSel.value;
+        aSel.innerHTML = `<option value="">-- Aucune archive --</option>` + state.haradaArchives.map((a,i)=>`<option value="${i}">${a.label}</option>`).join('');
+        aSel.value = curIdx;
+        const arch = curIdx !== '' ? state.haradaArchives[parseInt(curIdx,10)] : null;
+
+        document.getElementById('harada-archive-table').innerHTML = state.harada.map((p,i) => {
+          const diff = arch ? (pScores[i] - arch.scores[i]) : null;
+          return `<div class="flex items-center justify-between gap-2 hud-card px-2.5 py-1.5 rounded-xl text-xs">
+            <input type="text" value="${p.name}" onchange="window.renameHaradaPillar(${i},this.value)" class="bg-transparent font-bold text-bright outline-none flex-1">
+            <span class="mono-num font-bold text-accent">${pScores[i]}%</span>
+            ${diff!==null ? `<span class="mono-num font-bold ${diff>=0?'text-emerald-400':'text-rose-400'}">${diff>=0?'+':''}${diff.toFixed(1)}%</span>` : ''}
+          </div>`;
+        }).join('');
+
+        if (typeof Chart !== 'undefined') {
+          const cs = getComputedStyle(document.documentElement);
+          const acc = cs.getPropertyValue('--accent').trim(), warn = cs.getPropertyValue('--accent-warn').trim();
+          const grid = cs.getPropertyValue('--chart-grid').trim(), txt = cs.getPropertyValue('--text-main').trim();
+          if (chartRadar) chartRadar.destroy();
+          const ds = [{ label:'Actuel', data:pScores, borderColor:acc, backgroundColor:acc+'33', borderWidth:2 }];
+          if (arch) ds.push({ label:arch.label, data:arch.scores, borderColor:warn, borderDash:[5,4], backgroundColor:warn+'20', borderWidth:2 });
+          chartRadar = new Chart(document.getElementById('chart-harada-radar'), {
+            type:'radar', data:{ labels:state.harada.map(p=>p.name), datasets:ds },
+            options:{ responsive:true, maintainAspectRatio:false, scales:{ r:{ min:0, max:100, ticks:{display:false}, grid:{color:grid}, angleLines:{color:grid}, pointLabels:{color:txt,font:{size:10,weight:'700'}} } } }
+          });
+        }
+      }
+    }
+
+    function renderHistory() {
+      const tb = document.getElementById('history-table-body');
+      if (!state.history.length) { tb.innerHTML = '<tr><td colspan="6" class="py-4 text-center text-muted">Aucune journée enregistrée.</td></tr>'; return; }
+      tb.innerHTML = state.history.slice().reverse().map((h, ri) => {
+        const oi = state.history.length - 1 - ri;
+        return `<tr>
+          <td class="py-2 pr-2 font-bold text-bright">${h.date}</td>
+          <td class="py-2 px-2 text-accent">${h.tst}</td>
+          <td class="py-2 px-2 text-muted">${h.fcBed}/${h.fcWake}</td>
+          <td class="py-2 px-2 font-bold text-accent2">${h.iRecup}%</td>
+          <td class="py-2 px-2 font-sans text-bright">${h.sessionName} (${h.load} u.a.)</td>
+          <td class="py-2 pl-2 text-right whitespace-nowrap">
+            <button type="button" onclick="window.loadHistoryDay(${oi})" class="btn-ghost px-2 py-0.5 rounded text-xs mr-1">✏️</button>
+            <button type="button" onclick="window.deleteHistory(${oi})" class="btn-ghost px-2 py-0.5 rounded text-xs text-rose-400">🗑️</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    window.renderCharts = function() {
+      if (typeof Chart === 'undefined') return;
+      const sel = document.getElementById('chart-exo-select');
+      const keys = Object.keys(EXO_CATALOG).filter(k => EXO_CATALOG[k].type === 'rpt');
+      if (!sel.options.length) sel.innerHTML = keys.map(k => `<option value="${EXO_CATALOG[k].spec}">${EXO_CATALOG[k].name}</option>`).join('');
+      const spec = sel.value || 'HSPU';
+      const cs = getComputedStyle(document.documentElement);
+      const acc = cs.getPropertyValue('--accent').trim(), acc2 = cs.getPropertyValue('--accent-2').trim(), warn = cs.getPropertyValue('--accent-warn').trim();
+      const grid = cs.getPropertyValue('--chart-grid').trim(), txt = cs.getPropertyValue('--text-muted').trim();
+
+      const labels = state.history.map(h => h.label);
+      if (chartProg) chartProg.destroy();
+      chartProg = new Chart(document.getElementById('chart-progression'), {
+        type:'line',
+        data:{ labels, datasets:[
+          { label:`1-RM ${spec} (kg)`, data:state.history.map(h=>h.rm?.[spec]??null), borderColor:acc2, backgroundColor:acc2+'22', fill:true, tension:0.3, yAxisID:'y' },
+          { label:'Récupération (%)', data:state.history.map(h=>h.iRecup), borderColor:acc, borderDash:[5,4], tension:0.3, yAxisID:'y1' }
+        ]},
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ x:{ticks:{color:txt},grid:{color:grid}}, y:{position:'left',ticks:{color:acc2},grid:{color:grid}}, y1:{position:'right',min:40,max:100,ticks:{color:acc},grid:{drawOnChartArea:false}} } }
+      });
+
+      if (chartTend) chartTend.destroy();
+      chartTend = new Chart(document.getElementById('chart-tendon'), {
+        type:'line',
+        data:{ labels, datasets:[
+          { label:'Muscle (τ₁=21.5j)', data:state.history.map(h=>h.muscleAdapt), borderColor:acc, tension:0.3 },
+          { label:'Tendons (τ=65j)', data:state.history.map(h=>h.tendonAdapt), borderColor:warn, borderDash:[6,3], tension:0.3 }
+        ]},
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ x:{ticks:{color:txt},grid:{color:grid}}, y:{ticks:{color:txt},grid:{color:grid}} } }
+      });
+    };
+
+    function renderAll() {
+      renderProfile();
+      renderDiagnostic();
+      renderSleep();
+      renderSport();
+      renderSupps();
+      if (state.activeTab === 'courbes') window.renderCharts();
+      if (state.activeTab === 'prog') renderProgTable();
+      if (state.activeTab === 'harada') renderHarada();
+      if (state.activeTab === 'donnees') renderHistory();
+      saveState();
+    }
+
+    // BOOT
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      window.setTheme(state.theme || 'cyber');
+      window.switchTab(state.activeTab || 'jour');
+      renderAll();
+      if (!state.onboarded) window.openOnboarding();
+    });
+  })();
+  </script>
+</body>
+</html>
