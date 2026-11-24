@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="cyan">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#07111a" />
+  <title>HARADA-BIO v6.0</title>
+  <style>
+    /* =====================================================================
+       THEMES (5 PALETTES DONT NUIT ROUGE MONOCHROME PUR)
+       ===================================================================== */
+    :root, [data-theme="cyan"] {
+      --bg: #07111a;
+      --bg-elev: #0e1d2b;
+      --bg-card: #122536;
+      --border: #1e3a52;
+      --text: #e6f4fa;
+      --muted: #86a8bf;
+      --accent: #06b6d4;
+      --accent-2: #22d3ee;
+      --accent-soft: rgba(6, 182, 212, 0.16);
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --chart-1: #06b6d4;
+      --chart-2: #10b981;
+      --chart-3: #f59e0b;
+      --chart-grid: rgba(134, 168, 191, 0.22);
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    [data-theme="olive"] {
+      --bg: #101410;
+      --bg-elev: #181f17;
+      --bg-card: #1f281e;
+      --border: #334231;
+      --text: #edf2e8;
+      --muted: #98a892;
+      --accent: #84a948;
+      --accent-2: #a3c962;
+      --accent-soft: rgba(132, 169, 72, 0.18);
+      --ok: #84cc16;
+      --warn: #d97706;
+      --danger: #dc2626;
+      --chart-1: #a3c962;
+      --chart-2: #d4a373;
+      --chart-3: #84a948;
+      --chart-grid: rgba(152, 168, 146, 0.22);
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme="obsidian"] {
+      --bg: #09090b;
+      --bg-elev: #141417;
+      --bg-card: #1c1c21;
+      --border: #2e2c24;
+      --text: #f7f4ec;
+      --muted: #a19a88;
+      --accent: #d4af37;
+      --accent-2: #f3d266;
+      --accent-soft: rgba(212, 175, 55, 0.16);
+      --ok: #22c55e;
+      --warn: #eab308;
+      --danger: #ef4444;
+      --chart-1: #d4af37;
+      --chart-2: #e5e5e5;
+      --chart-3: #a16207;
+      --chart-grid: rgba(212, 175, 55, 0.2);
+      --shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    [data-theme="light"] {
+      --bg: #f4f6f9;
+      --bg-elev: #ffffff;
+      --bg-card: #ffffff;
+      --border: #d8e0ea;
+      --text: #0f172a;
+      --muted: #526277;
+      --accent: #0f4c81;
+      --accent-2: #2563eb;
+      --accent-soft: rgba(15, 76, 129, 0.1);
+      --ok: #059669;
+      --warn: #d97706;
+      --danger: #dc2626;
+      --chart-1: #0f4c81;
+      --chart-2: #059669;
+      --chart-3: #d97706;
+      --chart-grid: rgba(15, 23, 42, 0.12);
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+    }
+
+    /* NUIT ROUGE : 0% bleu, 0% vert (canaux G=0, B=0 stricts) */
+    [data-theme="nightred"] {
+      --bg: #000000;
+      --bg-elev: #0d0000;
+      --bg-card: #170000;
+      --border: #4a0000;
+      --text: #e00000;
+      --muted: #8f0000;
+      --accent: #ff0000;
+      --accent-2: #cc0000;
+      --accent-soft: rgba(255, 0, 0, 0.14);
+      --ok: #d60000;
+      --warn: #a80000;
+      --danger: #ff0000;
+      --chart-1: #ff0000;
+      --chart-2: #990000;
+      --chart-3: #660000;
+      --chart-grid: rgba(180, 0, 0, 0.28);
+      --shadow: none;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      font-size: 15px; line-height: 1.45;
+      min-height: 100vh;
+    }
+
+    /* Layout */
+    header.topbar {
+      position: sticky; top: 0; z-index: 40;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--bg-elev);
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: 0.06em; font-size: 15px; }
+    .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .brand small { font-weight: 500; color: var(--muted); font-size: 11px; letter-spacing: 0.03em; }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+
+    main.container {
+      max-width: 960px; margin: 0 auto;
+      padding: 14px 14px 92px;
+    }
+
+    /* Bottom Navigation */
+    nav.bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      background: var(--bg-elev);
+      border-top: 1px solid var(--border);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    nav.bottom-nav button {
+      background: none; border: none; color: var(--muted);
+      padding: 10px 4px 11px;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      font-size: 11px; font-weight: 600; cursor: pointer;
+    }
+    nav.bottom-nav button .ico { font-size: 17px; line-height: 1; }
+    nav.bottom-nav button.active {
+      color: var(--accent);
+      box-shadow: inset 0 2px 0 var(--accent);
+    }
+
+    /* Cards & Controls */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .card-title { font-size: 15px; font-weight: 700; margin: 0; letter-spacing: 0.01em; }
+    .muted { color: var(--muted); font-size: 12.5px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    @media (max-width: 640px) {
+      .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    label.field { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--muted); font-weight: 600; }
+    input[type="text"], input[type="number"], input[type="time"], input[type="date"], select, textarea {
+      width: 100%; padding: 9px 10px;
+      background: var(--bg-elev); color: var(--text);
+      border: 1px solid var(--border); border-radius: 9px;
+      font-size: 14px; font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 9px 13px; border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--bg-elev); color: var(--text);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: transform 0.08s ease, border-color 0.15s ease;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--accent); color: #041016; border-color: var(--accent); }
+    [data-theme="light"] .btn-primary { color: #ffffff; }
+    [data-theme="nightred"] .btn-primary { color: #000000; background: #cc0000; border-color: #ff0000; }
+    .btn-soft { background: var(--accent-soft); color: var(--accent-2); border-color: transparent; }
+    .btn-danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+    .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 7px; }
+    .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 9px; border-radius: 999px;
+      font-size: 11.5px; font-weight: 700;
+      background: var(--accent-soft); color: var(--accent-2);
+      border: 1px solid var(--border);
+    }
+    .pill.ok { color: var(--ok); }
+    .pill.warn { color: var(--warn); }
+    .pill.danger { color: var(--danger); }
+
+    /* KPI Strip */
+    .kpi-box {
+      background: var(--bg-elev); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px; text-align: center;
+    }
+    .kpi-val { font-size: 20px; font-weight: 800; color: var(--accent-2); }
+    .kpi-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* Express Toggle */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 10px 12px;
+      border-radius: 10px; background: var(--bg-elev); border: 1px solid var(--border);
+    }
+    .switch {
+      position: relative; width: 46px; height: 26px; flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; inset: 0; cursor: pointer;
+      background: var(--border); border-radius: 999px; transition: 0.2s;
+    }
+    .slider:before {
+      content: ""; position: absolute; height: 20px; width: 20px; left: 3px; bottom: 3px;
+      background: var(--text); border-radius: 50%; transition: 0.2s;
+    }
+    .switch input:checked + .slider { background: var(--accent); }
+    .switch input:checked + .slider:before { transform: translateX(20px); background: #000; }
+
+    /* Workout Exercise Row */
+    .ex-item {
+      border: 1px solid var(--border); border-radius: 11px;
+      padding: 11px; margin-bottom: 10px; background: var(--bg-elev);
+    }
+    .ex-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .set-row { display: grid; grid-template-columns: 44px 1fr 1fr auto; gap: 6px; align-items: center; margin-bottom: 6px; }
+    .set-row.uni { grid-template-columns: 44px 1fr 1fr 1fr auto; }
+    .asym-alert {
+      margin-top: 6px; padding: 6px 9px; border-radius: 7px;
+      border: 1px solid var(--warn); color: var(--warn); font-size: 12px; font-weight: 600;
+    }
+
+    /* Harada Grid 3x3 */
+    .harada-3x3 {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    .pillar-cell {
+      background: var(--bg-elev); border: 1px solid var(--border);
+      border-radius: 11px; padding: 10px 8px; cursor: pointer;
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-height: 92px; transition: border-color 0.15s;
+    }
+    .pillar-cell:hover, .pillar-cell.selected { border-color: var(--accent); }
+    .pillar-cell.center {
+      background: var(--accent-soft); border-color: var(--accent);
+      text-align: center; justify-content: center;
+    }
+    .p-name { font-size: 12px; font-weight: 700; line-height: 1.25; }
+    .p-score { font-size: 18px; font-weight: 800; color: var(--accent-2); margin-top: 4px; }
+    .p-bar { height: 5px; border-radius: 99px; background: var(--border); overflow: hidden; margin-top: 5px; }
+    .p-bar > span { display: block; height: 100%; background: var(--accent); }
+
+    .action-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 9px 10px; border-radius: 9px;
+      background: var(--bg-elev); border: 1px solid var(--border);
+      margin-bottom: 7px;
+    }
+    .action-meta { font-size: 11.5px; color: var(--muted); }
+
+    /* Rituals */
+    .ritual-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 11px; border-radius: 9px;
+      background: var(--bg-elev); border: 1px solid var(--border);
+      margin-bottom: 7px; cursor: pointer;
+    }
+    .ritual-item.done { border-color: var(--accent); background: var(--accent-soft); }
+
+    /* Tabs Visibility */
+    section.tab-panel { display: none; }
+    section.tab-panel.active { display: block; }
+
+    /* Onboarding Modal */
+    .overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0, 0, 0, 0.84);
+      display: flex; align-items: center; justify-content: center;
+      padding: 14px; overflow-y: auto;
+    }
+    .overlay.hidden { display: none; }
+    .wizard {
+      width: 100%; max-width: 560px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px; max-height: 92vh; overflow-y: auto;
+    }
+    .step-dots { display: flex; gap: 6px; margin-bottom: 14px; }
+    .step-dots span { flex: 1; height: 4px; border-radius: 99px; background: var(--border); }
+    .step-dots span.on { background: var(--accent); }
+    .choice-card {
+      border: 1px solid var(--border); border-radius: 11px;
+      padding: 11px 12px; margin-bottom: 8px; cursor: pointer;
+      background: var(--bg-elev);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .choice-card.selected { border-color: var(--accent); background: var(--accent-soft); }
+    .swatch { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; }
+
+    /* Canvas Charts */
+    canvas.chart { width: 100%; height: 220px; display: block; border-radius: 10px; background: var(--bg-elev); border: 1px solid var(--border); }
+    canvas.radar { width: 100%; max-width: 340px; height: 280px; display: block; margin: 0 auto; }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 76px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: #000; font-weight: 700; font-size: 13px;
+      padding: 9px 16px; border-radius: 999px; z-index: 200;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    [data-theme="light"] #toast { color: #fff; }
+    #toast.show { opacity: 1; }
+
+    /* Print A5 Sheet */
+    #a5-print-area { display: none; }
+    @media print {
+      @page { size: A5 portrait; margin: 8mm; }
+      body { background: #fff !important; color: #000 !important; font-size: 9.5pt; }
+      header, main, nav, .overlay, #toast { display: none !important; }
+      #a5-print-area { display: block !important; color: #000; }
+      #a5-print-area h1 { font-size: 13pt; margin: 0 0 4px; border-bottom: 1.5px solid #000; padding-bottom: 3px; }
+      #a5-print-area h2 { font-size: 10pt; margin: 8px 0 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+      #a5-print-area table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+      #a5-print-area th, #a5-print-area td { border: 1px solid #222; padding: 3px 5px; text-align: left; font-size: 8.5pt; }
+      #a5-print-area th { background: #eee; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <div>
+        HARADA-BIO <small id="hdr-user">v6.0</small>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-sm" id="btn-night-toggle" title="Basculer Nuit Rouge">🔴 Nuit</button>
+      <button class="btn btn-sm" id="btn-export-quick" title="Exporter sauvegarde JSON">⬇ .json</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="container">
+
+    <!-- ==================== TAB 1 : JOUR ==================== -->
+    <section id="tab-jour" class="tab-panel active">
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Journal du jour</h2>
+          <input type="date" id="jour-date" style="width:auto;" />
+        </div>
+        <div class="grid-4" id="jour-kpis">
+          <div class="kpi-box"><div class="kpi-val" id="kpi-sleep">--</div><div class="kpi-lbl">Sommeil net</div></div>
+          <div class="kpi-box"><div class="kpi-val" id="kpi-eff">--</div><div class="kpi-lbl">Efficacité</div></div>
+          <div class="kpi-box hr-only"><div class="kpi-val" id="kpi-dip">--</div><div class="kpi-lbl">Dipping FC</div></div>
+          <div class="kpi-box"><div class="kpi-val" id="kpi-recov">--</div><div class="kpi-lbl">Récup /100</div></div>
+        </div>
+      </div>
+
+      <!-- Sommeil & FC -->
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Sommeil &amp; Récupération</h2>
+          <span class="pill" id="sleep-mode-pill">Sommeil continu</span>
+        </div>
+        <div class="grid-3">
+          <label class="field">Coucher
+            <input type="time" id="in-bed" value="22:30" />
+          </label>
+          <label class="field">Lever
+            <input type="time" id="in-wake" value="06:30" />
+          </label>
+          <label class="field">Latence SOL (min)
+            <input type="number" id="in-sol" min="0" max="180" value="15" />
+          </label>
+          <label class="field">Éveils WASO (min)
+            <input type="number" id="in-waso" min="0" max="300" value="0" />
+          </label>
+          <label class="field">Sieste (min)
+            <input type="number" id="in-nap" min="0" max="180" value="0" />
+          </label>
+          <label class="field">Qualité ressentie (/10)
+            <input type="number" id="in-sq" min="1" max="10" value="8" />
+          </label>
+        </div>
+
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <button class="btn btn-sm" id="btn-add-wake">+ Ajouter un éveil nocturne</button>
+          <span class="muted" id="wake-events-list">Aucun éveil enregistré</span>
+        </div>
+
+        <div class="grid-2 hr-only" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+          <label class="field">FC au coucher (bpm)
+            <input type="number" id="in-hr-bed" min="30" max="140" placeholder="ex: 60" />
+          </label>
+          <label class="field">FC au réveil (bpm)
+            <input type="number" id="in-hr-wake" min="30" max="140" placeholder="ex: 50" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Sport & Express 20' -->
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Séance du jour</h2>
+          <select id="sel-workout" style="width:auto; min-width:170px;"></select>
+        </div>
+
+        <div class="toggle-row" style="margin-bottom:12px;">
+          <div>
+            <strong>⚡ Mode Express 20'</strong>
+            <div class="muted">Réduit les blocs RPT de 3 à 2 séries en conservant 100 % de la charge.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="chk-express" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div id="workout-exercises"></div>
+
+        <div class="grid-2" style="margin-top:10px; align-items:end;">
+          <label class="field">RPE global séance (/10)
+            <input type="number" id="in-rpe" min="1" max="10" step="0.5" value="7.5" />
+          </label>
+          <button class="btn btn-primary" id="btn-save-day">Enregistrer la journée</button>
+        </div>
+      </div>
+
+      <!-- Rituels -->
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Rituels &amp; Complémentation</h2>
+          <span class="muted" id="ritual-count">0/0</span>
+        </div>
+        <div id="rituals-list"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2 : HARADA ==================== -->
+    <section id="tab-harada" class="tab-panel">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Matrice Harada (1 · 8 · 64)</h2>
+            <div class="muted">Courbe de Hill (γ = 1,5 · ≥ 150 unités / 5 mois) + décroissance Δt</div>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-sm btn-soft" id="btn-copy-ai-prompt">🤖 Prompt IA Grille</button>
+            <button class="btn btn-sm" id="btn-archive-month">📸 Archiver le mois</button>
+          </div>
+        </div>
+
+        <!-- Simulateur temporel -->
+        <div class="toggle-row" style="margin-bottom:12px;">
+          <div style="flex:1;">
+            <strong>Simulateur temporel (Δt)</strong> : <span id="sim-days-lbl" class="pill">+0 jour</span>
+            <input type="range" id="sim-days" min="0" max="60" value="0" style="width:100%; margin-top:6px; accent-color:var(--accent);" />
+          </div>
+        </div>
+
+        <!-- 3x3 Grid -->
+        <div class="harada-3x3" id="harada-grid"></div>
+      </div>
+
+      <!-- Détail Pilier sélectionné -->
+      <div class="card" id="pillar-detail-card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title" id="det-pillar-title">Pilier sélectionné</h2>
+            <div class="muted" id="det-pillar-sub">Clique sur un pilier ci-dessus pour gérer ses 8 actions.</div>
+          </div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <select id="det-pillar-engine" class="btn-sm" style="width:auto;">
+              <option value="Lally">Moteur Lally (Habitudes)</option>
+              <option value="Physique">Moteur Physique (τ₁=21.5j)</option>
+              <option value="ACT-R">Moteur ACT-R (Espacement)</option>
+            </select>
+            <button class="btn btn-sm" id="btn-rename-pillar">✏️</button>
+          </div>
+        </div>
+        <div id="pillar-actions-list"></div>
+      </div>
+
+      <!-- Archives Mensuelles & Radar -->
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Radar &amp; Archives mensuelles (M vs M-1)</h2>
+          <select id="sel-archive-compare" style="width:auto;"></select>
+        </div>
+        <canvas id="canvas-harada-radar" class="radar" width="340" height="280"></canvas>
+        <div id="archive-deltas" class="grid-4" style="margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3 : COURBES ==================== -->
+    <section id="tab-courbes" class="tab-panel">
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Sommeil net (h) &amp; Récupération (14 derniers jours)</h2>
+          <span class="pill" id="chart-theme-badge">100 % local</span>
+        </div>
+        <canvas id="canvas-sleep" class="chart" width="800" height="220"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Charge d'entraînement (Volume × RPE) &amp; Forme</h2>
+        </div>
+        <canvas id="canvas-load" class="chart" width="800" height="220"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Surveillance Asymétrie Unilatérale (D / G)</h2>
+        </div>
+        <div id="asym-history" class="muted">Aucune asymétrie détectée pour le moment.</div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4 : PROG ==================== -->
+    <section id="tab-prog" class="tab-panel">
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Profil &amp; Apparence</h2>
+        </div>
+        <div class="grid-3">
+          <label class="field">Prénom / Pseudo
+            <input type="text" id="cfg-name" />
+          </label>
+          <label class="field">Poids (kg)
+            <input type="number" id="cfg-weight" step="0.1" />
+          </label>
+          <label class="field">Taille (cm)
+            <input type="number" id="cfg-height" />
+          </label>
+          <label class="field">Âge
+            <input type="number" id="cfg-age" />
+          </label>
+          <label class="field">FC Repos de référence (bpm)
+            <input type="number" id="cfg-rhr" />
+          </label>
+          <label class="field">Thème visuel
+            <select id="cfg-theme">
+              <option value="cyan">Cyber Cyan</option>
+              <option value="olive">Tactique Olive</option>
+              <option value="obsidian">Obsidienne &amp; Or</option>
+              <option value="light">Clair Minimaliste</option>
+              <option value="nightred">Nuit Rouge (0 lumière bleue)</option>
+            </select>
+          </label>
+        </div>
+        <div class="toggle-row" style="margin-top:12px;">
+          <div>
+            <strong>Mode Simplifié sans FC</strong>
+            <div class="muted">Masque tous les champs de fréquence cardiaque.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="cfg-simple-hr" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div style="margin-top:10px; text-align:right;">
+          <button class="btn btn-primary" id="btn-save-profile">Enregistrer le profil</button>
+        </div>
+      </div>
+
+      <!-- Éditeur de Séances -->
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Éditeur de séances &amp; exercices</h2>
+          <button class="btn btn-sm btn-primary" id="btn-add-session">+ Nouvelle séance</button>
+        </div>
+        <div id="prog-sessions-list"></div>
+      </div>
+
+      <!-- Éditeur Rituels -->
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Rituels quotidiens</h2>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <input type="text" id="new-ritual-txt" placeholder="Ajouter un rituel (ex: Lecture 20 min, Créatine...)" />
+          <button class="btn btn-primary" id="btn-add-ritual">+</button>
+        </div>
+        <div id="prog-rituals-list"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5 : DONNÉES ==================== -->
+    <section id="tab-donnees" class="tab-panel">
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Sauvegarde &amp; Transfert (.json)</h2>
+        </div>
+        <p class="muted" style="margin-top:0;">
+          Toutes tes données vivent uniquement dans le <code>localStorage</code> de cet appareil. Exporte régulièrement ton fichier <code>.json</code> pour sauvegarder ou transférer entre PC et téléphone.
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary" id="btn-export-json">⬇ Exporter mon .json</button>
+          <label class="btn" style="cursor:pointer;">
+            ⬆ Importer un .json
+            <input type="file" id="in-import-json" accept=".json,application/json" style="display:none;" />
+          </label>
+          <button class="btn btn-soft" id="btn-print-a5">🖨️ Fiche Papier A5</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Importer une Grille Harada (JSON IA)</h2>
+        </div>
+        <p class="muted" style="margin-top:0;">
+          Clique sur <strong>Prompt IA Grille</strong> dans l'onglet Harada, colle la réponse JSON de l'IA ici pour remplacer tes 8 piliers et 64 actions sans perdre ton historique sportif.
+        </p>
+        <textarea id="in-harada-json" rows="4" placeholder='{"goal":"Mon objectif","pillars":[{"name":"Pilier 1","engine":"Lally","actions":["Action 1",...]}]}'></textarea>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button class="btn btn-primary" id="btn-apply-harada-json">Appliquer la grille JSON</button>
+          <button class="btn btn-soft" id="btn-copy-ai-prompt-2">Copier le Prompt IA</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Assistant &amp; Réinitialisation</h2>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn" id="btn-reopen-wizard">🧭 Relancer l'assistant d'accueil</button>
+          <button class="btn btn-danger" id="btn-factory-reset">🗑️ Effacer toutes les données locales</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="active" data-tab="jour"><span class="ico">📅</span>Jour</button>
+    <button data-tab="harada"><span class="ico">🎯</span>Harada</button>
+    <button data-tab="courbes"><span class="ico">📈</span>Courbes</button>
+    <button data-tab="prog"><span class="ico">⚙️</span>Prog</button>
+    <button data-tab="donnees"><span class="ico">💾</span>Données</button>
+  </nav>
+
+  <!-- ONBOARDING WIZARD (4 ÉTAPES AU PREMIER PASSAGE) -->
+  <div class="overlay hidden" id="wizard-overlay">
+    <div class="wizard">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <strong style="letter-spacing:0.06em;">BIENVENUE SUR HARADA-BIO</strong>
+        <span class="pill" id="wiz-step-lbl">Étape 1 / 4</span>
+      </div>
+      <div class="step-dots" id="wiz-dots">
+        <span class="on"></span><span></span><span></span><span></span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="wiz-step" data-step="1">
+        <h3 style="margin:0 0 6px;">1. Ton profil &amp; biométrie</h3>
+        <p class="muted" style="margin:0 0 12px;">100 % local sur ton appareil. Déjà utilisateur ? Importe directement ta sauvegarde :</p>
+        <div style="margin-bottom:14px;">
+          <label class="btn btn-soft" style="width:100%; cursor:pointer;">
+            ⬆ Importer mon .json existant
+            <input type="file" id="wiz-import-json" accept=".json,application/json" style="display:none;" />
+          </label>
+        </div>
+        <div class="grid-2">
+          <label class="field">Prénom / Pseudo
+            <input type="text" id="wiz-name" placeholder="Ton prénom" />
+          </label>
+          <label class="field">Âge
+            <input type="number" id="wiz-age" value="23" />
+          </label>
+          <label class="field">Poids (kg)
+            <input type="number" id="wiz-weight" step="0.1" value="81.0" />
+          </label>
+          <label class="field">Taille (cm)
+            <input type="number" id="wiz-height" value="191" />
+          </label>
+          <label class="field">FC Repos (bpm)
+            <input type="number" id="wiz-rhr" value="50" />
+          </label>
+        </div>
+        <div class="toggle-row" style="margin-top:12px;">
+          <div>
+            <strong>Mode Simplifié sans FC</strong>
+            <div class="muted">Si tu ne mesures pas ta fréquence cardiaque au réveil.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="wiz-simple-hr" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="wiz-step" data-step="2" style="display:none;">
+        <h3 style="margin:0 0 6px;">2. Choisis ton style visuel</h3>
+        <p class="muted" style="margin:0 0 12px;">Tu pourras changer de thème à tout moment (et basculer en Nuit Rouge en 1 clic le soir).</p>
+        <div id="wiz-themes">
+          <div class="choice-card selected" data-val="cyan">
+            <div><strong>Cyber Cyan</strong><div class="muted">Bleu nuit profond &amp; accents cyan haute lisibilité</div></div>
+            <span class="swatch" style="background:#06b6d4;"></span>
+          </div>
+          <div class="choice-card" data-val="olive">
+            <div><strong>Tactique Olive</strong><div class="muted">Charbon mat &amp; vert kaki sobre</div></div>
+            <span class="swatch" style="background:#84a948;"></span>
+          </div>
+          <div class="choice-card" data-val="obsidian">
+            <div><strong>Obsidienne &amp; Or</strong><div class="muted">Noir profond &amp; finitions dorées</div></div>
+            <span class="swatch" style="background:#d4af37;"></span>
+          </div>
+          <div class="choice-card" data-val="light">
+            <div><strong>Clair Minimaliste</strong><div class="muted">Fond papier clair &amp; bleu marine</div></div>
+            <span class="swatch" style="background:#f4f6f9; border-color:#0f4c81;"></span>
+          </div>
+          <div class="choice-card" data-val="nightred">
+            <div><strong>Nuit Rouge</strong><div class="muted">Monochrome rouge pur (0 % lumière bleue/verte)</div></div>
+            <span class="swatch" style="background:#cc0000;"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="wiz-step" data-step="3" style="display:none;">
+        <h3 style="margin:0 0 6px;">3. Modèle d'entraînement</h3>
+        <p class="muted" style="margin:0 0 12px;">Tous les exercices, charges et incréments restent entièrement modifiables dans l'onglet Prog.</p>
+        <div id="wiz-sport">
+          <div class="choice-card selected" data-val="calisthenics">
+            <div><strong>Calisthénie &amp; Lest (+2.4 kg)</strong><div class="muted">Tractions RPT, Dips, HSPU, Pistol/Sissy squats unilatéraux, EMOM</div></div>
+            <span class="pill">Lest</span>
+          </div>
+          <div class="choice-card" data-val="weights">
+            <div><strong>Musculation Fonte (M₀=0 / +2.5 kg)</strong><div class="muted">Squat, Développé couché, Soulevé de terre, Rowing, Développé militaire</div></div>
+            <span class="pill">Fonte</span>
+          </div>
+          <div class="choice-card" data-val="endurance">
+            <div><strong>Endurance &amp; Sports Collectifs</strong><div class="muted">Course EF, Fractionné VMA, Renforcement fonctionnel, Mobilité</div></div>
+            <span class="pill">Cardio</span>
+          </div>
+          <div class="choice-card" data-val="blank">
+            <div><strong>Vierge</strong><div class="muted">Construis tes séances de zéro dans l'onglet Prog</div></div>
+            <span class="pill">Libre</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="wiz-step" data-step="4" style="display:none;">
+        <h3 style="margin:0 0 6px;">4. Objectif central &amp; Grille Harada</h3>
+        <label class="field" style="margin-bottom:12px;">Ton objectif central (6 à 12 mois)
+          <input type="text" id="wiz-goal" placeholder="ex: Maîtriser mon année et ma condition physique" />
+        </label>
+        <div id="wiz-harada">
+          <div class="choice-card selected" data-val="balance">
+            <div><strong>Équilibre Global</strong><div class="muted">Sommeil, Force, Nutrition, Focus, Apprentissage, Relations, Organisation, Discipline</div></div>
+            <span class="pill">8 piliers</span>
+          </div>
+          <div class="choice-card" data-val="athlete">
+            <div><strong>Performance Athlétique</strong><div class="muted">Force, Endurance, Mobilité, Récupération, Nutrition, Mental, Technique, Hygiène</div></div>
+            <span class="pill">Sport</span>
+          </div>
+          <div class="choice-card" data-val="blank">
+            <div><strong>Grille Vierge</strong><div class="muted">8 piliers vierges prêts à éditer (ou à remplir via le Prompt IA)</div></div>
+            <span class="pill">Libre</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; margin-top:16px; padding-top:12px; border-top:1px solid var(--border);">
+        <button class="btn" id="wiz-prev" style="visibility:hidden;">← Précédent</button>
+        <button class="btn btn-primary" id="wiz-next">Suivant →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- A5 PRINT AREA -->
+  <div id="a5-print-area"></div>
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <script>
+  (() => {
+    "use strict";
+
+    const STORAGE_KEY = "harada_bio_v6_state";
+
+    /* =====================================================================
+       PRESETS (100% NEUTRES — AUCUNE DONNÉE PERSONNELLE)
+       ===================================================================== */
+    const SPORT_PRESETS = {
+      calisthenics: [
+        {
+          id: "s_upper", name: "Haut du corps — RPT & Lest",
+          exercises: [
+            { id: "e1", name: "Tractions pronation lestées", type: "RPT", m0: 0, inc: 2.4, load: 9.6, targetReps: "5-7", sets: 3, unilateral: false },
+            { id: "e2", name: "Dips lestés", type: "RPT", m0: 0, inc: 2.4, load: 12.0, targetReps: "6-8", sets: 3, unilateral: false },
+            { id: "e3", name: "Handstand Push-Ups (HSPU)", type: "RPT", m0: 0, inc: 1.2, load: 0, targetReps: "5-8", sets: 3, unilateral: false },
+            { id: "e4", name: "Pompes lestées", type: "EMOM", m0: 0, inc: 2.4, load: 7.2, targetReps: "10' EMOM", sets: 3, unilateral: false }
+          ]
+        },
+        {
+          id: "s_lower", name: "Bas du corps — Unilatéral",
+          exercises: [
+            { id: "e5", name: "Pistol Squats", type: "RPT", m0: 0, inc: 2.4, load: 4.8, targetReps: "6-8", sets: 3, unilateral: true },
+            { id: "e6", name: "Sissy Squats", type: "Standard", m0: 0, inc: 1.2, load: 0, targetReps: "10-12", sets: 3, unilateral: false },
+            { id: "e7", name: "Hip Thrust 1 jambe", type: "RPT", m0: 0, inc: 2.4, load: 9.6, targetReps: "8-10", sets: 3, unilateral: true },
+            { id: "e8", name: "Mollets debout 1 jambe", type: "Standard", m0: 0, inc: 2.4, load: 4.8, targetReps: "12-15", sets: 3, unilateral: true }
+          ]
+        },
+        {
+          id: "s_cond", name: "Conditionnement / Pyramide",
+          exercises: [
+            { id: "e9", name: "Pyramide Tractions", type: "Pyramide", m0: 0, inc: 0, load: 0, targetReps: "1-2-3-4-5-4-3-2-1", sets: 1, unilateral: false },
+            { id: "e10", name: "Gainage dynamique", type: "EMOM", m0: 0, inc: 0, load: 0, targetReps: "10 min", sets: 2, unilateral: false }
+          ]
+        }
+      ],
+      weights: [
+        {
+          id: "w_push", name: "Push / Pull — Force",
+          exercises: [
+            { id: "w1", name: "Développé couché barre", type: "RPT", m0: 0, inc: 2.5, load: 70, targetReps: "5-7", sets: 3, unilateral: false },
+            { id: "w2", name: "Rowing haltère unilatéral", type: "RPT", m0: 0, inc: 2.5, load: 30, targetReps: "8-10", sets: 3, unilateral: true },
+            { id: "w3", name: "Développé militaire", type: "RPT", m0: 0, inc: 2.5, load: 45, targetReps: "6-8", sets: 3, unilateral: false }
+          ]
+        },
+        {
+          id: "w_legs", name: "Jambes — Force",
+          exercises: [
+            { id: "w4", name: "Back Squat", type: "RPT", m0: 0, inc: 2.5, load: 90, targetReps: "5-6", sets: 3, unilateral: false },
+            { id: "w5", name: "Soulevé de terre roumain", type: "RPT", m0: 0, inc: 2.5, load: 80, targetReps: "6-8", sets: 3, unilateral: false },
+            { id: "w6", name: "Fentes bulgares", type: "Standard", m0: 0, inc: 2.5, load: 15, targetReps: "8-10", sets: 3, unilateral: true }
+          ]
+        }
+      ],
+      endurance: [
+        {
+          id: "c_run", name: "Course & Renforcement",
+          exercises: [
+            { id: "c1", name: "Footing Endurance Fondamentale (min)", type: "Standard", m0: 0, inc: 5, load: 0, targetReps: "45 min", sets: 1, unilateral: false },
+            { id: "c2", name: "Fractionné 30/30 (répétitions)", type: "EMOM", m0: 0, inc: 0, load: 0, targetReps: "2×10", sets: 2, unilateral: false },
+            { id: "c3", name: "Fentes marchées", type: "Standard", m0: 0, inc: 2, load: 0, targetReps: "12/jambe", sets: 3, unilateral: true }
+          ]
+        }
+      ],
+      blank: []
+    };
+
+    function makePillar(id, name, engine, actionsList) {
+      const actions = [];
+      for (let i = 0; i < 8; i++) {
+        actions.push({
+          id: `${id}_a${i + 1}`,
+          name: actionsList[i] || `Action ${i + 1}`,
+          units: 0,
+          lastDate: null,
+          subactions: ["", "", ""]
+        });
+      }
+      return { id, name, engine, actions };
+    }
+
+    const HARADA_PRESETS = {
+      balance: {
+        goal: "Progresser durablement sur tous mes piliers",
+        pillars: [
+          makePillar("p1", "Sommeil & Récup", "Lally", ["Coucher régulier", "0 écran au réveil", "Lumière matinale", "Chambre fraîche", "Pas de caféine après 14h", "Sieste courte si besoin", "Journal sommeil", "Déconnexion soir"]),
+          makePillar("p2", "Force & Condition", "Physique", ["Séance Haut", "Séance Bas", "Mobilité articulaire", "Cardio zone 2", "Échauffement strict", "Surcharge progressive", "Gainage", "Récupération active"]),
+          makePillar("p3", "Nutrition", "Lally", ["Hydratation 2.5L", "Produits bruts", "Protéines suffisantes", "Légumes quotidiens", "Zéro ultra-transformé", "Préparation repas", "Complémentation régulière", "Dîner léger"]),
+          makePillar("p4", "Mental & Focus", "Lally", ["Bloc Deep Work 90'", "Zéro scroll passif", "Pause sans écran", "Respiration calme", "Planification veille", "Clarté priorités", "Lecture quotidienne", "Revue hebdomadaire"]),
+          makePillar("p5", "Apprentissage", "ACT-R", ["Rappel actif", "Fiches synthèse", "Exercice pratique", "Révision espacée", "Veille technique", "Analyse d'erreurs", "Enseigner un concept", "Projet personnel"]),
+          makePillar("p6", "Relations", "Lally", ["Nouvelles famille", "Écoute active", "Tenir ses engagements", "Temps de qualité", "Entraide", "Clarté communication", "Gratitude", "Sortie collective"]),
+          makePillar("p7", "Organisation", "Lally", ["Espace rangé", "Budget à jour", "Boîte mail vide", "Préparation matériel", "Ponctualité", "Liste 3 priorités", "Backups données", "Revue mensuelle"]),
+          makePillar("p8", "Discipline", "Lally", ["Lever à l'heure", "Respect protocole", "Action malgré friction", "Zéro excuse", "Constance quotidienne", "Honnêteté bilan", "Sobriété", "Tenue cap long terme"])
+        ]
+      },
+      athlete: {
+        goal: "Atteindre mon meilleur niveau athlétique",
+        pillars: [
+          makePillar("p1", "Force Maximale", "Physique", ["Travail RPT lourd", "Micro-surcharges", "Gainage lourd", "Équilibre D/G", "Technique propre", "Repos inter-séries", "Carnet charges", "Deload planifié"]),
+          makePillar("p2", "Endurance", "Physique", ["Zone 2 hebdo", "Travail seuil", "VMA courte", "Sortie longue", "Économie course", "Suivi FC", "Respiration nasale", "Progression volume"]),
+          makePillar("p3", "Mobilité & Prévention", "Lally", ["Épaules & thoracique", "Hanches", "Chevilles", "Renfo tendons", "Automassage", "Échauffement 10'", "Posture", "Bilan douleurs"]),
+          makePillar("p4", "Récupération", "Lally", ["8h sommeil", "Routine coucher", "FC repos matin", "Hydratation", "Électrolytes", "Sieste", "Jour de repos strict", "Gestion stress"]),
+          makePillar("p5", "Nutrition Sportive", "Lally", ["Apport protéique", "Glucides péri-séance", "Lipides qualité", "Micronutriments", "Zéro alcool", "Créatine", "Repas post-effort", "Suivi poids"]),
+          makePillar("p6", "Mental & Compétition", "ACT-R", ["Visualisation", "Routine pré-effort", "Gestion douleur", "Dialogue interne", "Fixation objectifs", "RETEX séance", "Calme sous pression", "Engagement total"]),
+          makePillar("p7", "Technique", "ACT-R", ["Analyse vidéo", "Drills spécifiques", "Travail vitesse", "Explosivité", "Coordination", "Points faibles", "Feedback externe", "Répétition qualité"]),
+          makePillar("p8", "Hygiène de vie", "Lally", ["Horaires fixes", "Zéro écran soir", "Marche quotidienne", "Exposition soleil", "Organisation sac", "Prévention blessures", "Constance", "Bilan mensuel"])
+        ]
+      },
+      blank: {
+        goal: "Mon objectif central",
+        pillars: Array.from({ length: 8 }, (_, i) => makePillar(`p${i + 1}`, `Pilier ${i + 1}`, "Lally", []))
+      }
+    };
+
+    const DEFAULT_RITUALS = [
+      "Verre d'eau & lumière matinale",
+      "Zéro écran 45 min au réveil",
+      "Hydratation complète",
+      "Lecture / Réflexion sans écran"
+    ];
+
+    /* =====================================================================
+       STATE MANAGEMENT
+       ===================================================================== */
+    function todayStr() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    }
+
+    function createEmptyState() {
+      return {
+        version: "6.0",
+        onboarded: false,
+        profile: {
+          name: "",
+          weight: 81.0,
+          height: 191,
+          age: 23,
+          rhr: 50,
+          simpleHR: false,
+          theme: "cyan",
+          prevTheme: "cyan"
+        },
+        sessions: JSON.parse(JSON.stringify(SPORT_PRESETS.calisthenics)),
+        rituals: [...DEFAULT_RITUALS],
+        harada: JSON.parse(JSON.stringify(HARADA_PRESETS.balance)),
+        days: {},
+        archives: []
+      };
+    }
+
+    let state = loadState();
+    let selectedPillarIdx = 0;
+    let simOffsetDays = 0;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return createEmptyState();
+        const parsed = JSON.parse(raw);
+        return mergeState(parsed);
+      } catch (e) {
+        return createEmptyState();
+      }
+    }
+
+    function mergeState(parsed) {
+      const base = createEmptyState();
+      if (!parsed || typeof parsed !== "object") return base;
+      const out = {
+        ...base,
+        ...parsed,
+        profile: { ...base.profile, ...(parsed.profile || parsed.config || parsed.user || {}) },
+        sessions: Array.isArray(parsed.sessions) ? parsed.sessions : (Array.isArray(parsed.workouts) ? parsed.workouts : base.sessions),
+        rituals: Array.isArray(parsed.rituals) ? parsed.rituals : base.rituals,
+        harada: parsed.harada && Array.isArray(parsed.harada.pillars) ? parsed.harada : base.harada,
+        days: parsed.days && typeof parsed.days === "object" ? parsed.days : (parsed.logs || {}),
+        archives: Array.isArray(parsed.archives) ? parsed.archives : []
+      };
+      // Ensure 8 pillars and 8 actions each
+      while (out.harada.pillars.length < 8) {
+        const idx = out.harada.pillars.length + 1;
+        out.harada.pillars.push(makePillar(`p${idx}`, `Pilier ${idx}`, "Lally", []));
+      }
+      out.harada.pillars.forEach((p, pi) => {
+        if (!p.engine) p.engine = "Lally";
+        if (!Array.isArray(p.actions)) p.actions = [];
+        while (p.actions.length < 8) {
+          p.actions.push({ id: `p${pi+1}_a${p.actions.length+1}`, name: `Action ${p.actions.length+1}`, units: 0, lastDate: null, subactions: ["", "", ""] });
+        }
+      });
+      return out;
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2300);
+    }
+
+    /* =====================================================================
+       THEME & HR MODE
+       ===================================================================== */
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      const isNight = theme === "nightred";
+      document.getElementById("btn-night-toggle").textContent = isNight ? "☀ Jour" : "🔴 Nuit";
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--bg").trim());
+      if (document.getElementById("tab-harada").classList.contains("active")) drawHaradaRadar();
+      if (document.getElementById("tab-courbes").classList.contains("active")) renderCharts();
+    }
+
+    function applyHRMode() {
+      const hide = !!state.profile.simpleHR;
+      document.querySelectorAll(".hr-only").forEach(el => {
+        el.style.display = hide ? "none" : "";
+      });
+    }
+
+    /* =====================================================================
+       MATHEMATICS : HILL CURVE (gamma = 1.5, >= 150 units = 100%) & DECAY
+       ===================================================================== */
+    const HILL_GAMMA = 1.5;
+    const HILL_K = 45;
+    const HILL_MAX_U = 150;
+    const HILL_NORM = Math.pow(HILL_MAX_U, HILL_GAMMA) / (Math.pow(HILL_MAX_U, HILL_GAMMA) + Math.pow(HILL_K, HILL_GAMMA));
+
+    function daysBetween(dateStrA, dateStrB) {
+      if (!dateStrA || !dateStrB) return 0;
+      const a = new Date(dateStrA + "T00:00:00");
+      const b = new Date(dateStrB + "T00:00:00");
+      return Math.max(0, Math.round((b - a) / 86400000));
+    }
+
+    function effectiveUnits(units, lastDate, engine, refDateStr, offsetDays = 0) {
+      if (!units || units <= 0) return 0;
+      const dt = (lastDate ? daysBetween(lastDate, refDateStr) : 0) + offsetDays;
+      if (engine === "Physique") {
+        // Fenêtre de récupération 72h (3 jours), puis tau1 = 21.5 j
+        if (dt <= 3) return units;
+        return units * Math.exp(-(dt - 3) / 21.5);
+      }
+      if (engine === "ACT-R") {
+        // Bonus espacement optimal +25% entre 2 et 7 jours, puis loi de puissance
+        if (dt < 2) return units;
+        if (dt <= 7) return units * 1.25;
+        return units * Math.pow(dt / 7, -0.5);
+      }
+      // Lally par défaut : tolérance 2 jours puis décroissance douce tau = 45 j
+      if (dt <= 2) return units;
+      return units * Math.exp(-(dt - 2) / 45);
+    }
+
+    function hillScore(uEff) {
+      if (uEff <= 0) return 0;
+      const raw = Math.pow(uEff, HILL_GAMMA) / (Math.pow(uEff, HILL_GAMMA) + Math.pow(HILL_K, HILL_GAMMA));
+      return Math.min(100, (raw / HILL_NORM) * 100);
+    }
+
+    function computePillarScore(pillar, refDate = todayStr(), offsetDays = simOffsetDays) {
+      // Somme des unités effectives sur les 8 actions (150 unités/pilier ~ 5 mois à ~1/j)
+      let totalU = 0;
+      pillar.actions.forEach(a => {
+        totalU += effectiveUnits(a.units || 0, a.lastDate, pillar.engine || "Lally", refDate, offsetDays);
+      });
+      return Math.round(hillScore(totalU) * 10) / 10;
+    }
+
+    function computeAllPillarScores(refDate = todayStr(), offsetDays = simOffsetDays) {
+      return state.harada.pillars.map(p => computePillarScore(p, refDate, offsetDays));
+    }
+
+    /* =====================================================================
+       TAB 1 : JOUR (SOMMEIL, FC, SPORT, EXPRESS 20', RITUELS)
+       ===================================================================== */
+    function getDayData(dateStr) {
+      if (!state.days[dateStr]) {
+        state.days[dateStr] = {
+          bed: "22:30", wake: "06:30", sol: 15, waso: 0, nap: 0, sq: 8,
+          wakeEvents: [],
+          hrBed: "", hrWake: "",
+          sessionId: state.sessions[0] ? state.sessions[0].id : "",
+          express: false,
+          rpe: 7.5,
+          workoutLog: {},
+          ritualsDone: []
+        };
+      }
+      return state.days[dateStr];
+    }
+
+    function calcSleepMetrics(d) {
+      const [bh, bm] = (d.bed || "22:30").split(":").map(Number);
+      const [wh, wm] = (d.wake || "06:30").split(":").map(Number);
+      let tib = (wh * 60 + wm) - (bh * 60 + bm);
+      if (tib <= 0) tib += 1440;
+      const sol = Number(d.sol) || 0;
+      const waso = Number(d.waso) || 0;
+      const nap = Number(d.nap) || 0;
+      const netMin = Math.max(0, tib - sol - waso);
+      const eff = tib > 0 ? Math.min(100, Math.round((netMin / tib) * 100)) : 0;
+
+      // Dipping FC
+      let dip = null;
+      const hb = Number(d.hrBed), hw = Number(d.hrWake);
+      if (!state.profile.simpleHR && hb > 0 && hw > 0) {
+        dip = Math.round(((hb - hw) / hb) * 1000) / 10;
+      }
+
+      // Indice de récupération /100
+      const sleepScore = Math.min(100, (netMin + nap * 0.5) / 480 * 100);
+      const sqScore = ((Number(d.sq) || 7) / 10) * 100;
+      let recov = sleepScore * 0.5 + eff * 0.25 + sqScore * 0.25;
+      if (!state.profile.simpleHR && hw > 0 && state.profile.rhr > 0) {
+        const deltaRhr = hw - state.profile.rhr;
+        const hrScore = Math.max(20, Math.min(100, 90 - deltaRhr * 4));
+        recov = recov * 0.7 + hrScore * 0.3;
+      }
+      return {
+        netH: (netMin / 60).toFixed(1),
+        netMin,
+        eff,
+        dip,
+        recov: Math.round(Math.max(0, Math.min(100, recov)))
+      };
+    }
+
+    function renderJour() {
+      const dateInput = document.getElementById("jour-date");
+      if (!dateInput.value) dateInput.value = todayStr();
+      const dateStr = dateInput.value;
+      const d = getDayData(dateStr);
+
+      document.getElementById("in-bed").value = d.bed || "22:30";
+      document.getElementById("in-wake").value = d.wake || "06:30";
+      document.getElementById("in-sol").value = d.sol ?? 15;
+      document.getElementById("in-waso").value = d.waso ?? 0;
+      document.getElementById("in-nap").value = d.nap ?? 0;
+      document.getElementById("in-sq").value = d.sq ?? 8;
+      document.getElementById("in-hr-bed").value = d.hrBed ?? "";
+      document.getElementById("in-hr-wake").value = d.hrWake ?? "";
+      document.getElementById("chk-express").checked = !!d.express;
+      document.getElementById("in-rpe").value = d.rpe ?? 7.5;
+
+      // Wake events
+      const ev = d.wakeEvents || [];
+      document.getElementById("wake-events-list").textContent = ev.length
+        ? "Éveils : " + ev.map(x => `${x.time} (${x.min}m)`).join(", ")
+        : "Aucun éveil enregistré";
+      document.getElementById("sleep-mode-pill").textContent = (Number(d.waso) > 0 || ev.length) ? "Sommeil fragmenté" : "Sommeil continu";
+
+      updateJourKPIs(d);
+
+      // Sessions dropdown
+      const sel = document.getElementById("sel-workout");
+      sel.innerHTML = `<option value="">-- Repos / Sans séance --</option>` +
+        state.sessions.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join("");
+      sel.value = d.sessionId || "";
+
+      renderWorkoutForm(d);
+      renderRituals(d);
+      applyHRMode();
+    }
+
+    function updateJourKPIs(d) {
+      const m = calcSleepMetrics(d);
+      document.getElementById("kpi-sleep").textContent = `${m.netH} h`;
+      document.getElementById("kpi-eff").textContent = `${m.eff} %`;
+      document.getElementById("kpi-dip").textContent = m.dip !== null ? `${m.dip} %` : "--";
+      document.getElementById("kpi-recov").textContent = `${m.recov}`;
+    }
+
+    function renderWorkoutForm(d) {
+      const box = document.getElementById("workout-exercises");
+      const session = state.sessions.find(s => s.id === d.sessionId);
+      if (!session || !session.exercises.length) {
+        box.innerHTML = `<p class="muted">Jour de repos ou séance vide. Personnalise tes séances dans l'onglet <strong>Prog</strong>.</p>`;
+        return;
+      }
+
+      const express = !!d.express;
+      box.innerHTML = "";
+      session.exercises.forEach(ex => {
+        const baseSets = Number(ex.sets) || 3;
+        const activeSets = (express && ex.type === "RPT" && baseSets >= 3) ? 2 : baseSets;
+        const log = d.workoutLog[ex.id] || Array.from({ length: activeSets }, (_, i) => ({
+          load: ex.type === "RPT" ? Math.max(0, +(ex.load * (i === 0 ? 1 : i === 1 ? 0.9 : 0.8)).toFixed(1)) : (ex.load || 0),
+          reps: "",
+          repsG: ""
+        }));
+
+        const wrap = document.createElement("div");
+        wrap.className = "ex-item";
+        wrap.innerHTML = `
+          <div class="ex-head">
+            <div>
+              <strong>${escapeHtml(ex.name)}</strong>
+              <span class="pill" style="margin-left:6px;">${ex.type}</span>
+              ${ex.unilateral ? `<span class="pill">Unilatéral D/G</span>` : ""}
+              ${express && ex.type === "RPT" ? `<span class="pill warn">Express 2 séries · 100% charge</span>` : ""}
+            </div>
+            <span class="muted">Cible : ${escapeHtml(ex.targetReps || "-")} · +${ex.inc || 0} kg</span>
+          </div>
+        `;
+
+        let asymMsg = "";
+        for (let i = 0; i < activeSets; i++) {
+          const s = log[i] || { load: ex.load || 0, reps: "", repsG: "" };
+          const row = document.createElement("div");
+          row.className = "set-row" + (ex.unilateral ? " uni" : "");
+          if (ex.unilateral) {
+            row.innerHTML = `
+              <span class="muted">S${i + 1}</span>
+              <input type="number" step="0.1" placeholder="Charge kg" value="${s.load ?? ""}" data-ex="${ex.id}" data-s="${i}" data-k="load" />
+              <input type="number" placeholder="Reps D" value="${s.reps ?? ""}" data-ex="${ex.id}" data-s="${i}" data-k="reps" />
+              <input type="number" placeholder="Reps G" value="${s.repsG ?? ""}" data-ex="${ex.id}" data-s="${i}" data-k="repsG" />
+              <span class="muted">kg</span>
+            `;
+            const rd = Number(s.reps), rg = Number(s.repsG);
+            if (rd > 0 && rg > 0) {
+              const diff = Math.abs(rd - rg);
+              const pct = (diff / Math.max(rd, rg)) * 100;
+              if (pct >= 12 || diff >= 2) {
+                asymMsg = `⚠️ Asymétrie D/G détectée (${rd} vs ${rg}, ${Math.round(pct)} %) — démarre la prochaine série par le côté faible.`;
+              }
+            }
+          } else {
+            row.innerHTML = `
+              <span class="muted">S${i + 1}</span>
+              <input type="number" step="0.1" placeholder="Charge kg" value="${s.load ?? ""}" data-ex="${ex.id}" data-s="${i}" data-k="load" />
+              <input type="number" placeholder="Reps" value="${s.reps ?? ""}" data-ex="${ex.id}" data-s="${i}" data-k="reps" />
+              <span class="muted">kg</span>
+            `;
+          }
+          wrap.appendChild(row);
+        }
+
+        if (asymMsg) {
+          const al = document.createElement("div");
+          al.className = "asym-alert";
+          al.textContent = asymMsg;
+          wrap.appendChild(al);
+        }
+        box.appendChild(wrap);
+      });
+
+      box.querySelectorAll("input").forEach(inp => {
+        inp.addEventListener("change", () => {
+          const exId = inp.dataset.ex, idx = Number(inp.dataset.s), k = inp.dataset.k;
+          if (!d.workoutLog[exId]) d.workoutLog[exId] = [];
+          while (d.workoutLog[exId].length <= idx) d.workoutLog[exId].push({ load: "", reps: "", repsG: "" });
+          d.workoutLog[exId][idx][k] = inp.value;
+          saveState();
+          renderWorkoutForm(d);
+        });
+      });
+    }
+
+    function renderRituals(d) {
+      const box = document.getElementById("rituals-list");
+      const done = new Set(d.ritualsDone || []);
+      document.getElementById("ritual-count").textContent = `${done.size}/${state.rituals.length}`;
+      if (!state.rituals.length) {
+        box.innerHTML = `<p class="muted">Aucun rituel configuré (modifiable dans Prog).</p>`;
+        return;
+      }
+      box.innerHTML = "";
+      state.rituals.forEach(r => {
+        const isDone = done.has(r);
+        const div = document.createElement("div");
+        div.className = "ritual-item" + (isDone ? " done" : "");
+        div.innerHTML = `<span>${escapeHtml(r)}</span><strong>${isDone ? "✓" : "○"}</strong>`;
+        div.addEventListener("click", () => {
+          if (done.has(r)) done.delete(r); else done.add(r);
+          d.ritualsDone = Array.from(done);
+          saveState();
+          renderRituals(d);
+        });
+        box.appendChild(div);
+      });
+    }
+
+    /* =====================================================================
+       TAB 2 : HARADA + ARCHIVES + RADAR
+       ===================================================================== */
+    function renderHarada() {
+      const grid = document.getElementById("harada-grid");
+      const scores = computeAllPillarScores();
+      const globalScore = (scores.reduce((a, b) => a + b, 0) / 8).toFixed(1);
+
+      // Mapping 3x3 : indices piliers autour du centre (4)
+      const order = [0, 1, 2, 3, -1, 4, 5, 6, 7];
+      grid.innerHTML = "";
+      order.forEach(idx => {
+        const cell = document.createElement("div");
+        if (idx === -1) {
+          cell.className = "pillar-cell center";
+          cell.innerHTML = `
+            <div class="muted" style="font-size:10px; text-transform:uppercase;">Objectif Central</div>
+            <div class="p-name" style="margin:3px 0;">${escapeHtml(state.harada.goal || "Objectif")}</div>
+            <div class="p-score">${globalScore} %</div>
+          `;
+          cell.addEventListener("click", () => {
+            const g = prompt("Modifier l'objectif central :", state.harada.goal);
+            if (g !== null && g.trim()) {
+              state.harada.goal = g.trim();
+              saveState();
+              renderHarada();
+            }
+          });
+        } else {
+          const p = state.harada.pillars[idx];
+          const sc = scores[idx];
+          cell.className = "pillar-cell" + (idx === selectedPillarIdx ? " selected" : "");
+          cell.innerHTML = `
+            <div>
+              <div class="p-name">${escapeHtml(p.name)}</div>
+              <div class="muted" style="font-size:10.5px;">${p.engine}</div>
+            </div>
+            <div>
+              <div class="p-score">${sc.toFixed(1)}%</div>
+              <div class="p-bar"><span style="width:${Math.min(100, sc)}%"></span></div>
+            </div>
+          `;
+          cell.addEventListener("click", () => {
+            selectedPillarIdx = idx;
+            renderHarada();
+          });
+        }
+        grid.appendChild(cell);
+      });
+
+      renderPillarDetail();
+      renderArchiveControls();
+      drawHaradaRadar();
+    }
+
+    function renderPillarDetail() {
+      const p = state.harada.pillars[selectedPillarIdx];
+      if (!p) return;
+      const sc = computePillarScore(p);
+      document.getElementById("det-pillar-title").textContent = `${p.name} (${sc.toFixed(1)} %)`;
+      document.getElementById("det-pillar-sub").textContent = `Moteur ${p.engine} · 150 unités effectives requises pour 100 %`;
+      document.getElementById("det-pillar-engine").value = p.engine || "Lally";
+
+      const list = document.getElementById("pillar-actions-list");
+      list.innerHTML = "";
+      p.actions.forEach((a, ai) => {
+        const uEff = effectiveUnits(a.units || 0, a.lastDate, p.engine, todayStr(), simOffsetDays);
+        const dt = a.lastDate ? daysBetween(a.lastDate, todayStr()) + simOffsetDays : null;
+        const row = document.createElement("div");
+        row.className = "action-row";
+        row.innerHTML = `
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:600; font-size:13.5px;">${ai + 1}. ${escapeHtml(a.name)}</div>
+            <div class="action-meta">
+              Brut : <strong>${a.units || 0}</strong> · Eff. : <strong>${uEff.toFixed(1)}</strong>
+              ${dt !== null ? ` · Δt = ${dt} j` : " · Jamais cochée"}
+            </div>
+          </div>
+          <div style="display:flex; gap:5px; flex-shrink:0;">
+            <button class="btn btn-xs" data-act="edit">✏️</button>
+            <button class="btn btn-xs" data-act="minus">-1</button>
+            <button class="btn btn-xs btn-primary" data-act="plus">+1</button>
+          </div>
+        `;
+        row.querySelector('[data-act="plus"]').addEventListener("click", () => {
+          a.units = (a.units || 0) + 1;
+          a.lastDate = todayStr();
+          saveState();
+          renderHarada();
+        });
+        row.querySelector('[data-act="minus"]').addEventListener("click", () => {
+          a.units = Math.max(0, (a.units || 0) - 1);
+          saveState();
+          renderHarada();
+        });
+        row.querySelector('[data-act="edit"]').addEventListener("click", () => {
+          const n = prompt("Nom de l'action :", a.name);
+          if (n !== null && n.trim()) {
+            a.name = n.trim();
+            saveState();
+            renderHarada();
+          }
+        });
+        list.appendChild(row);
+      });
+    }
+
+    function renderArchiveControls() {
+      const sel = document.getElementById("sel-archive-compare");
+      const cur = sel.value;
+      sel.innerHTML = `<option value="-1">Actuel seul</option>` +
+        state.archives.map((ar, i) => `<option value="${i}">Comparer avec ${escapeHtml(ar.label)}</option>`).join("");
+      if (cur && sel.querySelector(`option[value="${cur}"]`)) sel.value = cur;
+      else if (state.archives.length) sel.value = String(state.archives.length - 1);
+    }
+
+    function drawHaradaRadar() {
+      const canvas = document.getElementById("canvas-harada-radar");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      const cs = getComputedStyle(document.documentElement);
+      const c1 = cs.getPropertyValue("--chart-1").trim();
+      const c2 = cs.getPropertyValue("--chart-2").trim();
+      const gridC = cs.getPropertyValue("--chart-grid").trim();
+      const txtC = cs.getPropertyValue("--muted").trim();
+
+      const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.34;
+      const scores = computeAllPillarScores();
+      const compIdx = Number(document.getElementById("sel-archive-compare").value);
+      const prevScores = (compIdx >= 0 && state.archives[compIdx]) ? state.archives[compIdx].scores : null;
+
+      // Rings
+      ctx.strokeStyle = gridC;
+      ctx.lineWidth = 1;
+      [0.25, 0.5, 0.75, 1].forEach(f => {
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+          const ang = -Math.PI / 2 + (i * Math.PI * 2) / 8;
+          const x = cx + Math.cos(ang) * R * f;
+          const y = cy + Math.sin(ang) * R * f;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      });
+
+      // Axes & labels
+      ctx.fillStyle = txtC;
+      ctx.font = "11px sans-serif";
+      ctx.textAlign = "center";
+      for (let i = 0; i < 8; i++) {
+        const ang = -Math.PI / 2 + (i * Math.PI * 2) / 8;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(ang) * R, cy + Math.sin(ang) * R);
+        ctx.stroke();
+        const lx = cx + Math.cos(ang) * (R + 22);
+        const ly = cy + Math.sin(ang) * (R + 18) + 4;
+        const lbl = state.harada.pillars[i].name.slice(0, 11);
+        ctx.fillText(lbl, lx, ly);
+      }
+
+      const drawPoly = (vals, stroke, fillAlpha, dashed = false) => {
+        ctx.save();
+        ctx.beginPath();
+        vals.forEach((v, i) => {
+          const ang = -Math.PI / 2 + (i * Math.PI * 2) / 8;
+          const r = (Math.min(100, Math.max(0, v)) / 100) * R;
+          const x = cx + Math.cos(ang) * r;
+          const y = cy + Math.sin(ang) * r;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        if (dashed) ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.globalAlpha = fillAlpha;
+        ctx.fillStyle = stroke;
+        ctx.fill();
+        ctx.restore();
+      };
+
+      if (prevScores) drawPoly(prevScores, c2, 0.14, true);
+      drawPoly(scores, c1, 0.24, false);
+
+      // Deltas
+      const deltaBox = document.getElementById("archive-deltas");
+      if (!prevScores) {
+        deltaBox.innerHTML = `<div class="muted" style="grid-column:1/-1;">Archive un mois pour comparer tes deltas (M vs M-1).</div>`;
+      } else {
+        deltaBox.innerHTML = state.harada.pillars.map((p, i) => {
+          const d = +(scores[i] - (prevScores[i] || 0)).toFixed(1);
+          const sign = d > 0 ? `+${d}` : `${d}`;
+          return `<div class="kpi-box"><div class="kpi-val" style="font-size:15px;">${sign}%</div><div class="kpi-lbl">${escapeHtml(p.name.slice(0, 12))}</div></div>`;
+        }).join("");
+      }
+    }
+
+    /* =====================================================================
+       TAB 3 : COURBES (100% CANVAS NATIF, ADAPTÉ AU MODE NUIT ROUGE)
+       ===================================================================== */
+    function getLastNDays(n = 14) {
+      const arr = [];
+      const now = new Date();
+      for (let i = n - 1; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(now.getDate() - i);
+        const pad = x => String(x).padStart(2, "0");
+        arr.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
+      }
+      return arr;
+    }
+
+    function calcSessionLoad(dayData) {
+      if (!dayData || !dayData.sessionId) return 0;
+      const rpe = Number(dayData.rpe) || 7;
+      let repsCount = 0;
+      Object.values(dayData.workoutLog || {}).forEach(sets => {
+        (sets || []).forEach(s => {
+          const r = (Number(s.reps) || 0) + (Number(s.repsG) || 0);
+          const w = (Number(s.load) || 0) + 10;
+          repsCount += r * (w / 10);
+        });
+      });
+      return Math.round((repsCount > 0 ? repsCount : 20) * (rpe / 5));
+    }
+
+    function drawLineChart(canvasId, labels, seriesList, yMaxFixed = null) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      const cs = getComputedStyle(document.documentElement);
+      const gridC = cs.getPropertyValue("--chart-grid").trim();
+      const txtC = cs.getPropertyValue("--muted").trim();
+
+      const padL = 38, padR = 16, padT = 20, padB = 28;
+      const gw = W - padL - padR, gh = H - padT - padB;
+
+      let maxV = yMaxFixed || 10;
+      if (!yMaxFixed) {
+        seriesList.forEach(s => s.data.forEach(v => { if (v > maxV) maxV = v; }));
+        maxV = Math.ceil(maxV * 1.15);
+      }
+
+      // Grid
+      ctx.strokeStyle = gridC;
+      ctx.fillStyle = txtC;
+      ctx.font = "11px sans-serif";
+      ctx.lineWidth = 1;
+      for (let g = 0; g <= 4; g++) {
+        const y = padT + (gh * g) / 4;
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+        const val = Math.round(maxV * (1 - g / 4));
+        ctx.fillText(String(val), 6, y + 4);
+      }
+
+      // X labels
+      labels.forEach((lbl, i) => {
+        if (i % 2 === 0 || i === labels.length - 1) {
+          const x = padL + (gw * i) / Math.max(1, labels.length - 1);
+          ctx.fillText(lbl.slice(5), x - 14, H - 8);
+        }
+      });
+
+      // Series
+      seriesList.forEach(s => {
+        ctx.strokeStyle = s.color;
+        ctx.fillStyle = s.color;
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        s.data.forEach((v, i) => {
+          const x = padL + (gw * i) / Math.max(1, labels.length - 1);
+          const y = padT + gh - (Math.min(maxV, Math.max(0, v)) / maxV) * gh;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        s.data.forEach((v, i) => {
+          const x = padL + (gw * i) / Math.max(1, labels.length - 1);
+          const y = padT + gh - (Math.min(maxV, Math.max(0, v)) / maxV) * gh;
+          ctx.beginPath(); ctx.arc(x, y, 3.2, 0, Math.PI * 2); ctx.fill();
+        });
+      });
+    }
+
+    function renderCharts() {
+      const cs = getComputedStyle(document.documentElement);
+      const c1 = cs.getPropertyValue("--chart-1").trim();
+      const c2 = cs.getPropertyValue("--chart-2").trim();
+
+      const days = getLastNDays(14);
+      const sleepH = days.map(d => state.days[d] ? Number(calcSleepMetrics(state.days[d]).netH) : 0);
+      const recov10 = days.map(d => state.days[d] ? calcSleepMetrics(state.days[d]).recov / 10 : 0);
+      drawLineChart("canvas-sleep", days, [
+        { name: "Sommeil (h)", color: c1, data: sleepH },
+        { name: "Récup (/10)", color: c2, data: recov10 }
+      ], 11);
+
+      const loads = days.map(d => calcSessionLoad(state.days[d]));
+      // EWMA Forme simple (tau = 21.5j)
+      let fit = 0;
+      const fitness = loads.map(l => {
+        fit = fit * Math.exp(-1 / 21.5) + l * 0.25;
+        return Math.round(fit);
+      });
+      drawLineChart("canvas-load", days, [
+        { name: "Charge jour", color: c1, data: loads },
+        { name: "Forme (EWMA)", color: c2, data: fitness }
+      ]);
+
+      // Asymmetries
+      const asymBox = document.getElementById("asym-history");
+      const alerts = [];
+      Object.entries(state.days).sort().reverse().slice(0, 14).forEach(([dt, d]) => {
+        Object.entries(d.workoutLog || {}).forEach(([exId, sets]) => {
+          (sets || []).forEach((s, si) => {
+            const rd = Number(s.reps), rg = Number(s.repsG);
+            if (rd > 0 && rg > 0) {
+              const diff = Math.abs(rd - rg);
+              const pct = Math.round((diff / Math.max(rd, rg)) * 100);
+              if (pct >= 12 || diff >= 2) {
+                alerts.push(`${dt} · Série ${si + 1} : ${rd} D vs ${rg} G (${pct} %)`);
+              }
+            }
+          });
+        });
+      });
+      asymBox.innerHTML = alerts.length
+        ? alerts.map(a => `<div class="asym-alert">${escapeHtml(a)}</div>`).join("")
+        : "Aucune asymétrie D/G notable sur les 14 derniers jours.";
+    }
+
+    /* =====================================================================
+       TAB 4 : PROG (ÉDITEUR SÉANCES, PROFIL, RITUELS)
+       ===================================================================== */
+    function renderProg() {
+      document.getElementById("cfg-name").value = state.profile.name || "";
+      document.getElementById("cfg-weight").value = state.profile.weight ?? 81.0;
+      document.getElementById("cfg-height").value = state.profile.height ?? 191;
+      document.getElementById("cfg-age").value = state.profile.age ?? 23;
+      document.getElementById("cfg-rhr").value = state.profile.rhr ?? 50;
+      document.getElementById("cfg-theme").value = state.profile.theme || "cyan";
+      document.getElementById("cfg-simple-hr").checked = !!state.profile.simpleHR;
+
+      // Sessions editor
+      const sBox = document.getElementById("prog-sessions-list");
+      sBox.innerHTML = "";
+      if (!state.sessions.length) {
+        sBox.innerHTML = `<p class="muted">Aucune séance. Clique sur <strong>+ Nouvelle séance</strong> pour commencer.</p>`;
+      }
+      state.sessions.forEach((sess, si) => {
+        const card = document.createElement("div");
+        card.className = "ex-item";
+        card.innerHTML = `
+          <div class="ex-head">
+            <strong>${escapeHtml(sess.name)}</strong>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-xs btn-soft" data-a="add-ex">+ Exercice</button>
+              <button class="btn btn-xs btn-danger" data-a="del-s">Suppr.</button>
+            </div>
+          </div>
+          <div class="ex-list"></div>
+        `;
+        const list = card.querySelector(".ex-list");
+        sess.exercises.forEach((ex, ei) => {
+          const row = document.createElement("div");
+          row.className = "action-row";
+          row.innerHTML = `
+            <div>
+              <strong>${escapeHtml(ex.name)}</strong>
+              <div class="action-meta">${ex.type} · ${ex.sets} séries · Charge ${ex.load} kg (+${ex.inc} kg) ${ex.unilateral ? "· Unilatéral D/G" : ""}</div>
+            </div>
+            <button class="btn btn-xs btn-danger">✕</button>
+          `;
+          row.querySelector("button").addEventListener("click", () => {
+            sess.exercises.splice(ei, 1);
+            saveState();
+            renderProg();
+          });
+          list.appendChild(row);
+        });
+
+        card.querySelector('[data-a="add-ex"]').addEventListener("click", () => {
+          const name = prompt("Nom de l'exercice :");
+          if (!name || !name.trim()) return;
+          const type = prompt("Type (RPT, Standard, EMOM, Pyramide) :", "RPT") || "RPT";
+          const load = Number(prompt("Charge de travail initiale (kg, 0 si poids du corps) :", "0")) || 0;
+          const inc = Number(prompt("Incrément micro-surcharge (kg, ex: 2.4 ou 2.5) :", "2.4")) || 0;
+          const sets = Number(prompt("Nombre de séries :", "3")) || 3;
+          const unilateral = confirm("Suivi unilatéral Droite / Gauche (OK = Oui, Annuler = Non) ?");
+          sess.exercises.push({
+            id: "ex_" + Date.now(),
+            name: name.trim(),
+            type: type.trim(),
+            m0: 0, inc, load, sets,
+            targetReps: "6-8",
+            unilateral
+          });
+          saveState();
+          renderProg();
+        });
+
+        card.querySelector('[data-a="del-s"]').addEventListener("click", () => {
+          if (confirm(`Supprimer la séance "${sess.name}" ?`)) {
+            state.sessions.splice(si, 1);
+            saveState();
+            renderProg();
+          }
+        });
+
+        sBox.appendChild(card);
+      });
+
+      // Rituals editor
+      const rBox = document.getElementById("prog-rituals-list");
+      rBox.innerHTML = "";
+      state.rituals.forEach((r, ri) => {
+        const row = document.createElement("div");
+        row.className = "action-row";
+        row.innerHTML = `<span>${escapeHtml(r)}</span><button class="btn btn-xs btn-danger">✕</button>`;
+        row.querySelector("button").addEventListener("click", () => {
+          state.rituals.splice(ri, 1);
+          saveState();
+          renderProg();
+        });
+        rBox.appendChild(row);
+      });
+    }
+
+    /* =====================================================================
+       A5 PRINTABLE SHEET
+       ===================================================================== */
+    function printA5Sheet() {
+      const area = document.getElementById("a5-print-area");
+      const name = state.profile.name ? ` — ${escapeHtml(state.profile.name)}` : "";
+      const sessHtml = state.sessions.map(s => `
+        <tr>
+          <td><strong>${escapeHtml(s.name)}</strong></td>
+          <td>${s.exercises.map(e => `${escapeHtml(e.name)} (${e.sets}× · ${e.load}kg)`).join(" · ")}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="2">Aucune séance configurée</td></tr>`;
+
+      const daysLabels = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+      const rows = daysLabels.map(dl => `
+        <tr>
+          <td><strong>${dl}</strong></td>
+          <td></td><td></td><td></td>
+          ${state.profile.simpleHR ? "" : "<td></td><td></td>"}
+          <td></td>
+        </tr>
+      `).join("");
+
+      area.innerHTML = `
+        <h1>HARADA-BIO · Fiche Hebdomadaire A5${name}</h1>
+        <div style="font-size:8.5pt; margin-bottom:6px;">
+          Objectif : <strong>${escapeHtml(state.harada.goal)}</strong> · Semaine du ____ / ____ / ______
+        </div>
+        <h2>1. Suivi Matinal Sans Écran (Sommeil${state.profile.simpleHR ? "" : " & FC"})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Jour</th><th>Coucher</th><th>Lever</th><th>Éveils</th>
+              ${state.profile.simpleHR ? "" : "<th>FC Coucher</th><th>FC Réveil</th>"}
+              <th>Notes / RPE</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <h2>2. Séances &amp; Charges cibles (Express 20' : 2 séries RPT à 100 % charge)</h2>
+        <table>
+          <thead><tr><th style="width:28%;">Séance</th><th>Exercices &amp; Charges</th></tr></thead>
+          <tbody>${sessHtml}</tbody>
+        </table>
+        <h2>3. Rituels quotidiens</h2>
+        <div style="font-size:8.5pt;">${state.rituals.map(r => `☐ ${escapeHtml(r)}`).join(" &nbsp;&nbsp; ")}</div>
+      `;
+      window.print();
+    }
+
+    /* =====================================================================
+       AI PROMPT GENERATOR & JSON IMPORT/EXPORT
+       ===================================================================== */
+    function copyAIPrompt() {
+      const promptTxt = `Tu es un coach spécialiste de la méthode Harada.
+Mon objectif central est : "${state.harada.goal || "[MON OBJECTIF]"}".
+Génère une grille Harada complète composée de 8 piliers et 8 actions concrètes par pilier (64 actions au total).
+Pour chaque pilier, choisis le moteur adapté parmi : "Lally" (habitudes), "Physique" (sport/force), ou "ACT-R" (apprentissage/compétences).
+Réponds UNIQUEMENT avec un bloc JSON valide respectant strictement ce format :
+{
+  "goal": "Mon objectif central",
+  "pillars": [
+    {
+      "name": "Nom du pilier 1",
+      "engine": "Lally",
+      "actions": ["Action 1", "Action 2", "Action 3", "Action 4", "Action 5", "Action 6", "Action 7", "Action 8"]
+    }
+  ]
+}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(promptTxt).then(() => toast("Prompt IA copié ! Colle-le dans ton IA."));
+      } else {
+        prompt("Copie ce prompt IA :", promptTxt);
+      }
+    }
+
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `harada-bio-backup-${todayStr()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast("Sauvegarde .json exportée");
+    }
+
+    function handleImportFile(file, closeWizard = false) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          state = mergeState(parsed);
+          state.onboarded = true;
+          saveState();
+          applyTheme(state.profile.theme || "cyan");
+          if (closeWizard) document.getElementById("wizard-overlay").classList.add("hidden");
+          refreshAll();
+          toast("Profil .json importé avec succès !");
+        } catch (err) {
+          alert("Fichier JSON invalide : " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* =====================================================================
+       ONBOARDING WIZARD (4 ÉTAPES)
+       ===================================================================== */
+    let wizStep = 1;
+    let wizTheme = "cyan";
+    let wizSport = "calisthenics";
+    let wizHarada = "balance";
+
+    function openWizard() {
+      wizStep = 1;
+      wizTheme = state.profile.theme || "cyan";
+      document.getElementById("wiz-name").value = state.profile.name || "";
+      document.getElementById("wiz-weight").value = state.profile.weight ?? 81.0;
+      document.getElementById("wiz-height").value = state.profile.height ?? 191;
+      document.getElementById("wiz-age").value = state.profile.age ?? 23;
+      document.getElementById("wiz-rhr").value = state.profile.rhr ?? 50;
+      document.getElementById("wiz-simple-hr").checked = !!state.profile.simpleHR;
+      document.getElementById("wiz-goal").value = state.harada.goal || "";
+      updateWizardUI();
+      document.getElementById("wizard-overlay").classList.remove("hidden");
+    }
+
+    function updateWizardUI() {
+      document.querySelectorAll(".wiz-step").forEach(el => {
+        el.style.display = Number(el.dataset.step) === wizStep ? "block" : "none";
+      });
+      document.getElementById("wiz-step-lbl").textContent = `Étape ${wizStep} / 4`;
+      document.querySelectorAll("#wiz-dots span").forEach((sp, i) => {
+        sp.classList.toggle("on", i < wizStep);
+      });
+      document.getElementById("wiz-prev").style.visibility = wizStep === 1 ? "hidden" : "visible";
+      document.getElementById("wiz-next").textContent = wizStep === 4 ? "Lancer HARADA-BIO ✓" : "Suivant →";
+    }
+
+    function bindChoiceGroup(containerId, onPick) {
+      const box = document.getElementById(containerId);
+      box.querySelectorAll(".choice-card").forEach(c => {
+        c.addEventListener("click", () => {
+          box.querySelectorAll(".choice-card").forEach(x => x.classList.remove("selected"));
+          c.classList.add("selected");
+          onPick(c.dataset.val);
+        });
+      });
+    }
+
+    /* =====================================================================
+       EVENTS & INIT
+       ===================================================================== */
+    function escapeHtml(str) {
+      return String(str ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+
+    function refreshAll() {
+      document.getElementById("hdr-user").textContent = state.profile.name ? `· ${state.profile.name}` : "v6.0";
+      applyTheme(state.profile.theme || "cyan");
+      applyHRMode();
+      renderJour();
+      renderHarada();
+      renderProg();
+    }
+
+    function initEvents() {
+      // Bottom Nav
+      document.querySelectorAll("nav.bottom-nav button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tab = btn.dataset.tab;
+          document.querySelectorAll("nav.bottom-nav button").forEach(b => b.classList.toggle("active", b === btn));
+          document.querySelectorAll("section.tab-panel").forEach(sec => sec.classList.toggle("active", sec.id === `tab-${tab}`));
+          if (tab === "harada") renderHarada();
+          if (tab === "courbes") renderCharts();
+          if (tab === "prog") renderProg();
+          if (tab === "jour") renderJour();
+        });
+      });
+
+      // Night Red quick toggle
+      document.getElementById("btn-night-toggle").addEventListener("click", () => {
+        if (state.profile.theme === "nightred") {
+          state.profile.theme = state.profile.prevTheme && state.profile.prevTheme !== "nightred" ? state.profile.prevTheme : "cyan";
+        } else {
+          state.profile.prevTheme = state.profile.theme || "cyan";
+          state.profile.theme = "nightred";
+        }
+        saveState();
+        applyTheme(state.profile.theme);
+        document.getElementById("cfg-theme").value = state.profile.theme;
+      });
+
+      document.getElementById("btn-export-quick").addEventListener("click", exportJSON);
+      document.getElementById("btn-export-json").addEventListener("click", exportJSON);
+      document.getElementById("in-import-json").addEventListener("change", e => handleImportFile(e.target.files[0], false));
+      document.getElementById("wiz-import-json").addEventListener("change", e => handleImportFile(e.target.files[0], true));
+      document.getElementById("btn-print-a5").addEventListener("click", printA5Sheet);
+
+      // Jour listeners
+      document.getElementById("jour-date").addEventListener("change", renderJour);
+      ["in-bed", "in-wake", "in-sol", "in-waso", "in-nap", "in-sq", "in-hr-bed", "in-hr-wake", "in-rpe"].forEach(id => {
+        document.getElementById(id).addEventListener("change", () => {
+          const d = getDayData(document.getElementById("jour-date").value);
+          d.bed = document.getElementById("in-bed").value;
+          d.wake = document.getElementById("in-wake").value;
+          d.sol = Number(document.getElementById("in-sol").value) || 0;
+          d.waso = Number(document.getElementById("in-waso").value) || 0;
+          d.nap = Number(document.getElementById("in-nap").value) || 0;
+          d.sq = Number(document.getElementById("in-sq").value) || 8;
+          d.hrBed = document.getElementById("in-hr-bed").value;
+          d.hrWake = document.getElementById("in-hr-wake").value;
+          d.rpe = Number(document.getElementById("in-rpe").value) || 7.5;
+          saveState();
+          updateJourKPIs(d);
+          document.getElementById("sleep-mode-pill").textContent = (d.waso > 0 || (d.wakeEvents && d.wakeEvents.length)) ? "Sommeil fragmenté" : "Sommeil continu";
+        });
+      });
+
+      document.getElementById("btn-add-wake").addEventListener("click", () => {
+        const d = getDayData(document.getElementById("jour-date").value);
+        const time = prompt("Heure de l'éveil (ex: 03:15) :", "03:00");
+        if (!time) return;
+        const min = Number(prompt("Durée de l'éveil en minutes :", "10")) || 0;
+        if (!Array.isArray(d.wakeEvents)) d.wakeEvents = [];
+        d.wakeEvents.push({ time, min });
+        d.waso = (Number(d.waso) || 0) + min;
+        saveState();
+        renderJour();
+      });
+
+      document.getElementById("sel-workout").addEventListener("change", e => {
+        const d = getDayData(document.getElementById("jour-date").value);
+        d.sessionId = e.target.value;
+        saveState();
+        renderWorkoutForm(d);
+      });
+
+      document.getElementById("chk-express").addEventListener("change", e => {
+        const d = getDayData(document.getElementById("jour-date").value);
+        d.express = e.target.checked;
+        saveState();
+        renderWorkoutForm(d);
+      });
+
+      document.getElementById("btn-save-day").addEventListener("click", () => {
+        saveState();
+        toast("Journée enregistrée localement ✓");
+      });
+
+      // Harada listeners
+      document.getElementById("sim-days").addEventListener("input", e => {
+        simOffsetDays = Number(e.target.value) || 0;
+        document.getElementById("sim-days-lbl").textContent = `+${simOffsetDays} jour${simOffsetDays > 1 ? "s" : ""}`;
+        renderHarada();
+      });
+
+      document.getElementById("det-pillar-engine").addEventListener("change", e => {
+        state.harada.pillars[selectedPillarIdx].engine = e.target.value;
+        saveState();
+        renderHarada();
+      });
+
+      document.getElementById("btn-rename-pillar").addEventListener("click", () => {
+        const p = state.harada.pillars[selectedPillarIdx];
+        const n = prompt("Nouveau nom du pilier :", p.name);
+        if (n && n.trim()) {
+          p.name = n.trim();
+          saveState();
+          renderHarada();
+        }
+      });
+
+      document.getElementById("btn-archive-month").addEventListener("click", () => {
+        const label = prompt("Nom de l'archive (ex: 2026-11) :", todayStr().slice(0, 7));
+        if (!label || !label.trim()) return;
+        state.archives.push({ label: label.trim(), date: todayStr(), scores: computeAllPillarScores(todayStr(), 0) });
+        saveState();
+        renderHarada();
+        toast(`Archive "${label.trim()}" sauvegardée`);
+      });
+
+      document.getElementById("sel-archive-compare").addEventListener("change", drawHaradaRadar);
+      document.getElementById("btn-copy-ai-prompt").addEventListener("click", copyAIPrompt);
+      document.getElementById("btn-copy-ai-prompt-2").addEventListener("click", copyAIPrompt);
+
+      // Apply Harada JSON
+      document.getElementById("btn-apply-harada-json").addEventListener("click", () => {
+        try {
+          const raw = document.getElementById("in-harada-json").value.trim();
+          const obj = JSON.parse(raw);
+          if (!Array.isArray(obj.pillars) || obj.pillars.length < 1) throw new Error("Tableau 'pillars' manquant");
+          if (obj.goal) state.harada.goal = String(obj.goal);
+          state.harada.pillars = Array.from({ length: 8 }, (_, i) => {
+            const src = obj.pillars[i] || {};
+            return makePillar(`p${i + 1}`, src.name || `Pilier ${i + 1}`, ["Lally", "Physique", "ACT-R"].includes(src.engine) ? src.engine : "Lally", Array.isArray(src.actions) ? src.actions : []);
+          });
+          saveState();
+          renderHarada();
+          toast("Grille Harada mise à jour ✓");
+        } catch (err) {
+          alert("Erreur JSON Harada : " + err.message);
+        }
+      });
+
+      // Prog listeners
+      document.getElementById("btn-save-profile").addEventListener("click", () => {
+        state.profile.name = document.getElementById("cfg-name").value.trim();
+        state.profile.weight = Number(document.getElementById("cfg-weight").value) || 70;
+        state.profile.height = Number(document.getElementById("cfg-height").value) || 175;
+        state.profile.age = Number(document.getElementById("cfg-age").value) || 25;
+        state.profile.rhr = Number(document.getElementById("cfg-rhr").value) || 55;
+        state.profile.theme = document.getElementById("cfg-theme").value;
+        state.profile.simpleHR = document.getElementById("cfg-simple-hr").checked;
+        saveState();
+        refreshAll();
+        toast("Profil mis à jour ✓");
+      });
+
+      document.getElementById("btn-add-session").addEventListener("click", () => {
+        const name = prompt("Nom de la nouvelle séance :");
+        if (!name || !name.trim()) return;
+        state.sessions.push({ id: "s_" + Date.now(), name: name.trim(), exercises: [] });
+        saveState();
+        renderProg();
+      });
+
+      document.getElementById("btn-add-ritual").addEventListener("click", () => {
+        const inp = document.getElementById("new-ritual-txt");
+        if (!inp.value.trim()) return;
+        state.rituals.push(inp.value.trim());
+        inp.value = "";
+        saveState();
+        renderProg();
+      });
+
+      // Données listeners
+      document.getElementById("btn-reopen-wizard").addEventListener("click", openWizard);
+      document.getElementById("btn-factory-reset").addEventListener("click", () => {
+        if (confirm("Effacer définitivement toutes les données locales de cet appareil ?")) {
+          localStorage.removeItem(STORAGE_KEY);
+          state = createEmptyState();
+          refreshAll();
+          openWizard();
+        }
+      });
+
+      // Wizard choices
+      bindChoiceGroup("wiz-themes", val => { wizTheme = val; applyTheme(val); });
+      bindChoiceGroup("wiz-sport", val => { wizSport = val; });
+      bindChoiceGroup("wiz-harada", val => { wizHarada = val; });
+
+      document.getElementById("wiz-prev").addEventListener("click", () => {
+        if (wizStep > 1) { wizStep--; updateWizardUI(); }
+      });
+
+      document.getElementById("wiz-next").addEventListener("click", () => {
+        if (wizStep < 4) {
+          wizStep++;
+          updateWizardUI();
+          return;
+        }
+        // Finalize onboarding
+        state.profile.name = document.getElementById("wiz-name").value.trim();
+        state.profile.weight = Number(document.getElementById("wiz-weight").value) || 81.0;
+        state.profile.height = Number(document.getElementById("wiz-height").value) || 191;
+        state.profile.age = Number(document.getElementById("wiz-age").value) || 23;
+        state.profile.rhr = Number(document.getElementById("wiz-rhr").value) || 50;
+        state.profile.simpleHR = document.getElementById("wiz-simple-hr").checked;
+        state.profile.theme = wizTheme;
+        if (wizTheme !== "nightred") state.profile.prevTheme = wizTheme;
+
+        state.sessions = JSON.parse(JSON.stringify(SPORT_PRESETS[wizSport] || []));
+        state.harada = JSON.parse(JSON.stringify(HARADA_PRESETS[wizHarada] || HARADA_PRESETS.balance));
+        const customGoal = document.getElementById("wiz-goal").value.trim();
+        if (customGoal) state.harada.goal = customGoal;
+        state.onboarded = true;
+        saveState();
+        document.getElementById("wizard-overlay").classList.add("hidden");
+        refreshAll();
+        toast("HARADA-BIO est prêt !");
+      });
+    }
+
+    initEvents();
+    refreshAll();
+    if (!state.onboarded) openWizard();
+  })();
+  </script>
+</body>
+</html>
